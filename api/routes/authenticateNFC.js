@@ -17,17 +17,17 @@ function createConnection(){
     return connection;
 }
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//                                              GET/POST REQUEST    
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// //                                              GET/POST REQUEST    
+// //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-// Handle GET request (will first call authenticateNFC function and the logAuthentication)
+// // Handle GET request (will first call authenticateNFC function and the logAuthentication)
 router.get('/', authenticateNFC, logAuthentication);
 
-// Handle POST request (will first call authenticateNFC function and the logAuthentication)
+// // Handle POST request (will first call authenticateNFC function and the logAuthentication)
 router.post('/', authenticateNFC, logAuthentication);
 
-////////////////////////////////////////////  Card Authentication  ///////////////////////////////////////////////////
+// ////////////////////////////////////////////  Card Authentication  ///////////////////////////////////////////////////
 
 function authenticateNFC(req, res, next) {
     const qs = {
@@ -69,10 +69,11 @@ function authenticateNFC(req, res, next) {
                                 pin: rows[0].pin
                             });
                             connection.end();
+                            next();
                         }
                         else{
                             res.status(404).json({
-                                error: "card id not found"
+                                error: "Card id not found"
                             });
                             connection.end();
                         }
@@ -81,65 +82,67 @@ function authenticateNFC(req, res, next) {
             }
         });
     }
-
     console.log("Card Authenticated");
 
     // Used to call "logAuthentication"
-    next();
+    
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////  Log Card Auth  //////////////////////////////////////////////////
+// ////////////////////////////////////////////  Log Card Auth  //////////////////////////////////////////////////
     
 function logAuthentication(req, res) {
+    console.log(req.query.cardID);
     
     let connection = createConnection();
     connection.connect(function(err){
         if(err){
-            res.status(200).json({
-                error: err
-            });
+            console.log(err.message);
             connection.end();
         }
         else{
             var cardID = req.query.cardID;   // cardID should be set in cardAuth when they 
 
             connection.query(`SELECT * FROM CardAuthentication WHERE cardID = ${cardID}`, (err, rows) => {
-                if(err) throw err;
-
-                var today = new Date();
-                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                var dateTime = date+' '+time;
-                
-                var logType = "cardAuthentication";
-                var logData = {
-                    "cardID":rows[0].cardID,
-                    "cardType": rows[0].cardType,
-                    "authenticated": "activated",   // ******************************* authenticated?
-                    "timestamp": dateTime
+                if(err) {
+                    console.log("Card ID not found");
                 }
+                else {
+                    if(rows.length > 0){
+                        var today = new Date();
+                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                        var dateTime = date+' '+time;
+                        
+                        var logType = "cardAuthentication";
+                        var logData = {
+                            "cardID":rows[0].cardID,
+                            "cardType": rows[0].cardType,
+                            "authenticated": "activated",   // ******************************* authenticated?
+                            "timestamp": dateTime
+                        }
+                            
+        //                 // **************************************************
+        //                 //              Write JSON to textfile       
+        //                 // -------------------------------------------------  
+        //                 // var log = {
+        //                 //     "logType": logType,
+        //                 //     "logData": logData
+        //                 // }
+        //                 //     // add log to textFile
+        //                 // **************************************************
 
-                console.log(logData);
-                    
-                // **************************************************
-                //              Write JSON to textfile       
-                // -------------------------------------------------  
-                // var log = {
-                //     "logType": logType,
-                //     "logData": logData
-                // }
-                //     // add log to textFile
-                // **************************************************
-
-                // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-                // request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                //     // res.status(200).json( {
-                //     //     "return:": body
-                //     // });
-                //     console.log(err, body);
-                // })    
+        //                 // send log to reporting  (qs: {"logType":logtype, "logFile": file})
+                        request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
+                            // console.log(err, body);
+                            connection.end();
+                        });    
+                    }
+                    else {
+                        connection.end();
+                    }
+                }
             });
         }
    });

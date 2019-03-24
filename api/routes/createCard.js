@@ -6,16 +6,18 @@ var fs = require('fs');
 
 
 // Create connection to JawsDB Database
-var connection = mysql.createConnection(process.env.JAWSDB_URL);
+// var connection = mysql.createConnection(process.env.JAWSDB_URL);
 
-// Connect to DB
-connection.connect(function(err) {
-    if(err) throw err;
-
-     // variable to hold cardID (received in JSON format)
-    //  const cardID;
-
-
+function createConnection(){
+    let connection = mysql.createConnection({
+        host     : 'bmsyhziszmhf61g1.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        database : 'vjjekhqqcjiymvbw',
+        user     : 'x5egnnu6zrkw3t21',
+        password : 'h3fbdgtreyr4gr0g',
+        port: '3306'
+    });
+    return connection;
+}
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //                                              GET/POST REQUEST    
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -29,15 +31,21 @@ connection.connect(function(err) {
 //////////////////////////////////////////////  Create Card  /////////////////////////////////////////////////////
 
     function createCard(req, res, next) {
-        
-        // ********************************
-            // Create Card Code Here... 
-        // ********************************
-        console.log("Card Createed");
-        
-        
-        // Used to call "logCreate"
-        next();
+        let connection = createConnection();
+        connection.connect(function(err) {
+            if(err) {
+                console.log(err.message);
+            } else {
+                // ********************************
+                    // Create Card Code Here... 
+                // ********************************
+                res.status(200).json({
+                    message: "Card Created"
+                });
+                connection.end();
+                next();
+            }
+        });
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -45,52 +53,54 @@ connection.connect(function(err) {
 ////////////////////////////////////////////  Log Create Card  //////////////////////////////////////////////////
     
     function logCreate(req, res) {
-
-        connection.query(`SELECT * FROM CardAuthentication ORDER BY cardID DESC LIMIT 1`, (err, rows) => {
-            if(err) throw err;
-
-            var today = new Date();
-            var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-            var dateTime = date+' '+time;
-            
-            var logType = "cardCreateed";
-            var logData = {
-                "cardID":rows[0].cardID,
-                "cardType": rows[0].cardType,
-                "clientID" : rows[0].clientID,
-                "description": "activated",
-                "timestamp": dateTime
+        let connection = createConnection();
+        connection.connect(function(err) {
+            if(err) {
+                console.log(err.message);
+                connection.end();
             }
+            else{
+                connection.query(`SELECT * FROM CardAuthentication ORDER BY cardID DESC LIMIT 1`, (err, rows) => {
+                    if(err) {
+                        console.log("Card ID not found");
+                    }
+                    else {
 
-            // **************************************************
-            //              Write JSON to textfile       
-            // -------------------------------------------------  
-            // var log = {
-            //     "logType": logType,
-            //     "logData": logData
-            // }
-            //     // add log to textFile
-            // **************************************************
+                        var today = new Date();
+                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                        var dateTime = date+' '+time;
+                        
+                        var logType = "cardCreateed";
+                        var logData = {
+                            "cardID":rows[0].cardID,
+                            "cardType": rows[0].cardType,
+                            "clientID" : rows[0].clientID,
+                            "description": "activated",
+                            "timestamp": dateTime
+                        }
 
-             // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-            request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                res.status(200).json( {
-                    "return:": body
+                        // **************************************************
+                        //              Write JSON to textfile       
+                        // -------------------------------------------------  
+                        // var log = {
+                        //     "logType": logType,
+                        //     "logData": logData
+                        // }
+                        //     // add log to textFile
+                        // **************************************************
+
+                        // send log to reporting  (qs: {"logType":logtype, "logFile": file})
+                        request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
+                            console.log(err, body);
+                            connection.end();
+                        })    
+                    }
                 });
-                console.log(err, body);
-            })    
+            }
         });
-
-        
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-    // connection.end();
-});
 
 module.exports = router;
