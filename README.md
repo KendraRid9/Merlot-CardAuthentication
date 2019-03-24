@@ -1,2 +1,2 @@
-# Merlot-CardAuthentication
-COS301 Mini-Project. Team Merlot, Card Authentication. Demo 2.
+# Merlot-CardAuth-Demo2
+COS301 Mini-Project Demo 2 Card Authentication
