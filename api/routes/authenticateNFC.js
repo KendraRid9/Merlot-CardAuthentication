@@ -120,6 +120,8 @@ function logAuthentication(req, res) {
                     "authenticated": "activated",   // ******************************* authenticated?
                     "timestamp": dateTime
                 }
+
+                console.log(logData);
                     
                 // **************************************************
                 //              Write JSON to textfile       
@@ -132,12 +134,12 @@ function logAuthentication(req, res) {
                 // **************************************************
 
                 // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-                request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                    // res.status(200).json( {
-                    //     "return:": body
-                    // });
-                    console.log(err, body);
-                })    
+                // request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
+                //     // res.status(200).json( {
+                //     //     "return:": body
+                //     // });
+                //     console.log(err, body);
+                // })    
             });
         }
    });
