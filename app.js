@@ -3,10 +3,10 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const authenticateRoutes = require('./api/routes/authenticateNFC');
-const resetPinRoutes = require('./api/routes/resetPin');
-const cardCreateRoutes = require('./api/routes/cardCreate');
-const cardRemoveRoutes = require('./api/routes/cardRemove');
+const authenticateRoute = require('./api/routes/authenticateNFC');
+const resetPinRoute = require('./api/routes/resetPin');
+const cancelCardRoute = require('./api/routes/cancelCard');
+const createCardRoute = require('./api/routes/createCard');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -15,10 +15,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 //Send any requests with authenticateNFC to the correct route
-app.use('/authenticateNFC', authenticateRoutes);
-app.use('/resetPin', resetPinRoutes);
-app.use('/cardCreate', cardCreateRoutes);
-app.use('/cardRemove', cardRemoveRoutes);
+app.use('/authenticateNFC', authenticateRoute);
+app.use('/resetPin', resetPinRoute);
+app.use('/createCard', createCardRoute);
+app.use('/cancelCard', cancelCardRoute);
 
 //Error handling when url doesn't exist
 app.use((req, res, next) => {
