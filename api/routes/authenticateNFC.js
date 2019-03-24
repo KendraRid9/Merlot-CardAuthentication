@@ -31,8 +31,8 @@ router.post('/', authenticateNFC, logAuthentication);
 
 function authenticateNFC(req, res, next) {
     const qs = {
-        cardID: req.body.cardID,
-        pin: req.body.pin
+        cardID: req.query.cardID,
+        pin: req.query.pin
     };
 
     if(qs.cardID === undefined || qs.pin === undefined){
@@ -140,7 +140,7 @@ function logAuthentication(req, res) {
                 })    
             });
         }
-   }
+   });
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
