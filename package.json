@@ -1,0 +1,21 @@
+{
+  "name": "merlot_nfc_api",
+  "version": "1.0.0",
+  "description": "Restful API for Merlot NFC data retrieval",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Graeme Coetzee",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "http": "0.0.0",
+    "mysql": "^2.16.0",
+    "request": "^2.88.0",
+    "router": "^1.3.3"
+  }
+}
