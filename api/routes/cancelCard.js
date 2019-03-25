@@ -60,62 +60,72 @@ function createConnection(){
 ////////////////////////////////////////  Log Card Cancellations /////////////////////////////////////////////
     
     function logCancel(req, res) {
+
         let connection = createConnection();
-        connection.connect(function(err) {
-            if(err){
-                console.log(err.message);
-            }
+
+        var clientID = req.query.clientID;   // clientID should be set in cancelCard when they
         
-            var clientID = req.query.clientID;   // clientID should be set in cancelCard when they 
-
-            connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${clientID}`, (err, result) => {
+        if(clientID === undefined || clientID ===''){
+            console.log('Client ID not found')
+        }else {
+            connection.connect(function(err) {
                 if(err){
-                   console.log("client not found");
-                   connection.end();
-                } else {
-
-                    var cards = "{";
-
-                    // iterate for all the rows in result
-                    Object.keys(result).forEach(function(key) {
-                        var row = result[key];      
-                        cards += `cardID: ${row.cardID},`;
-                        cards += `cardType: ${row.cardType}`;    // ADDING "," ?????
-                    });
-
-                    cards += "}";
-
-                    var today = new Date();
-                    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                    var dateTime = date+' '+time;
-                    
-                    var logType = "cardCanceled";
-                    var logData = {    
-                        "clientID" : clientID,
-                        "cards" : cards,
-                        "description": "deactivated",
-                        "timestamp": dateTime
-                    }
-
-                    // **************************************************
-                    //              Write JSON to textfile       
-                    // -------------------------------------------------  
-                    // var log = {
-                    //     "logType": logType,
-                    //     "logData": logData
-                    // }
-                    //     // add log to textFile
-                    // **************************************************
-
-                    // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-                    request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                        console.log(err, body);
-                        connection.end();
-                    })    
+                    console.log(err.message);
                 }
-            });    
-        });
+                else {
+                    connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${clientID}`, (err, rows) => {
+                        if(err){
+                           console.log("Client not found");
+                           connection.end();
+                        }
+                        else {
+
+                            if(rows.length > 0) {
+        
+                                var cards = "";
+        
+                                // iterate for all the rows in result
+                                for (var i = 0; i < rows.length; i++) {
+                                    cards += "{";
+                                    cards += `\"cardID\": \"${rows[i].cardID}\",`;
+                                    cards += `\"cardType\": \"${rows[i].cardType}\"`;    // ADDING "," ?????
+                                    cards += "}"
+                                    if(i < (rows.length-1)){
+                                        cards += ","
+                                    }
+                                }
+        
+                                //get timestamp
+                                var today = new Date();
+                                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                                var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                                var dateTime = date+' '+time;
+        
+                                if (fs.existsSync("auth.txt")) {
+                                    // json string for log
+                                    var jsonString = `,{\"logType\":\"cardsCancelled\",\"logData\":{\"clientID\":\"${clientID}\",\"description\":\"deactivated\",\"timestamp\":\"${dateTime}\",\"cards\":[ ${cards} ]}}`;
+                                } else {
+                                    // json string for log
+                                    var jsonString = `{\"logType\":\"cardsCancelled\",\"logData\":{\"clientID\":\"${clientID}\",\"description\":\"deactivated\",\"timestamp\":\"${dateTime}\",\"cards\":[ ${cards} ]}}`;
+                                }
+                            
+        
+                                // **************************************************
+                                //              Write JSON to textfile       
+                                // -------------------------------------------------  
+                                fs.appendFile("auth.txt", jsonString, function(err, data) {
+                                    if (err) console.log(err.message);
+                                    console.log("Successfully Logged Card Cancellation to Log File.");
+                                });
+                                // **************************************************
+                            } else {
+                                console.log("Client not found");
+                            }
+                        }
+                    }); 
+                }
+            });
+        }
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
