@@ -46,7 +46,6 @@ var fs = require('fs');
               });
             } 
           });
-
           res.status(200).send("Logs sent");
         }
       });  
@@ -90,11 +89,8 @@ var fs = require('fs');
                   }
                 }
               });
-
-              
             } 
           });
-
           res.status(200).send("Logs sent");
         }
       });      
