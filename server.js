@@ -11,12 +11,3 @@ const server = http.createServer(app);
 server.listen(port, () => {
     console.log("Listening on port " + port);
 });
-
-// request.get({
-//     url: "http://localhost:3000/authenticateNFC",
-//     qs: {
-//         "cardID": "12345",
-//     }},
-//     function(err,response,body){
-//         console.log(err,body);
-//     });

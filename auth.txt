@@ -1,0 +1,1 @@
+{"logType":"cardAuthentication","logData":{"cardID":"1","cardType":"NFC","status":"0","timestamp":"2019-3-26 0:2:14"}}

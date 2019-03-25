@@ -2,12 +2,14 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const fs = require('fs');
 
 const authenticateRoute = require('./api/routes/authenticateNFC');
 const resetPinRoute = require('./api/routes/resetPin');
 const cancelCardRoute = require('./api/routes/cancelCard');
 const createCardRoute = require('./api/routes/createCard');
 const sendLogsRoute = require('./api/routes/sendLogs');
+const displayHTML = require('./api/routes/displayHTML');
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -22,7 +24,7 @@ app.use('/resetPin', resetPinRoute);
 app.use('/createCard', createCardRoute);
 app.use('/cancelCard', cancelCardRoute);
 app.use('/sendLogs', sendLogsRoute);
-
+app.use('/',displayHTML)
 
 //Error handling when url doesn't exist
 app.use((req, res, next) => {
