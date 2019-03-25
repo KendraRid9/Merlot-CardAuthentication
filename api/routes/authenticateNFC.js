@@ -35,6 +35,8 @@ function authenticateNFC(req, res, next) {
         pin: req.query.pin
     };
 
+    req.authenticated = 0;
+
     if(qs.cardID === undefined || qs.pin === undefined){
         res.status(404).json({
             error: "GET Failed",
@@ -46,7 +48,8 @@ function authenticateNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(200).json({
+                res.status(404).json({
+                    message: "Database connection issue",
                     error: err,
                 });
                 connection.end();
@@ -56,7 +59,7 @@ function authenticateNFC(req, res, next) {
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(404).json({
-                            error: err
+                            error: "Card ID not in database"
                         });
                         connection.end();
                         res.locals.authenticated = "0";
@@ -65,21 +68,28 @@ function authenticateNFC(req, res, next) {
                     }
                     else{
                         if(rows.length > 0){
-                            res.status(200).json({
-                                cardID : rows[0].cardID,
-                                clientID : rows[0].clientID,
-                                active: rows[0].active,
-                                salt: rows[0].salt,
-                                pin: rows[0].pin
-                            });
-                            connection.end();
-                            res.locals.authenticated = "1";
-                            // Used to call "logAuthentication"
-                            next();
+                            // let hash = rows[0].salt + qs.pin;
+                            let hash = qs.pin;
+                            if(hash == rows[0].pin){
+                                connection.end();
+                                res.status(200).json({
+                                    status: "Authorized",
+                                    clientID: qs.clientID,
+                                    active: rows[0].active
+                                });
+                                req.authenticated = 1;
+                            } else {
+                                connection.end();
+                                res.status(200).json({
+                                    status: "NotAuthorized",
+                                    reason: "Incorrect Pin"
+                                });
+                                req.authenticated = 0;
+                            }
                         }
                         else{
                             res.status(404).json({
-                                error: "NotAuthenticated"
+                                error: "Card ID not in database"
                             });
                             connection.end();
                             res.locals.authenticated = "0";
@@ -91,6 +101,7 @@ function authenticateNFC(req, res, next) {
             }
         });
     }
+    next();
     console.log("Card Authenticated");
 
     
