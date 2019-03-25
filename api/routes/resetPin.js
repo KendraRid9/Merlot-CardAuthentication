@@ -31,9 +31,9 @@ function createConnection(){
 //////////////////////////////////////////////  Reset PIN  /////////////////////////////////////////////////////
 
 function resetPIN(req, res, next) {
-    if(req.query.cardID === undefined || req.query.cardID == ''){
+    if(req.query.clientID === undefined || req.query.clientID == ''){
         res.status(404).json({
-            message: "No Card ID was found"
+            message: "No Client ID was found"
         });
     } else {
         let connection = createConnection();
@@ -42,7 +42,7 @@ function resetPIN(req, res, next) {
                 console.log(err.message);
             } else {
                 // ********************************
-                    // Cancel Cards Code Here... 
+                    // Reset PIN Code Here... 
                 // ********************************
                 res.status(200).json({
                     message: "PIN reset"
@@ -59,52 +59,64 @@ function resetPIN(req, res, next) {
 ////////////////////////////////////////////  Log PIN Reset  //////////////////////////////////////////////////
     
     function logReset(req, res) {
+
         let connection = createConnection();
-        var cardID = req.query.cardID;  
-        if(cardID === undefined || cardID ===''){
-            console.log('Card ID not found')
+
+        var clientID = req.query.clientID;  
+
+        if(clientID === undefined || clientID ===''){
+            console.log('Client ID not found')
         }else {
             connection.connect(function(err) {
                 if(err) {
                     console.log(err.message);
                 }
                 else{
-                    connection.query(`SELECT * FROM CardAuthentication WHERE cardID = ${cardID}`, (err, rows) => {
+                    connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${clientID}`, (err, rows) => {
                         if(err){
                             console.log(err.message);
-                            console.log("Invalid card ID");
+                            console.log("Invalid Client ID");
                         }
                         else{
                             if(rows.length > 0){
+
+                                var cards = "";
+
+                                // iterate for all the rows in result
+                                for (var i = 0; i < rows.length; i++) {
+                                    cards += "{";
+                                    cards += `\"cardID\": \"${rows[i].cardID}\",`;
+                                    cards += `\"cardType\": \"${rows[i].cardType}\"`;    // ADDING "," ?????
+                                    cards += "}"
+                                    if(i < (rows.length-1)){
+                                        cards += ","
+                                    }
+                                }
+
+                                // get timestamp
                                 var today = new Date();
                                 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                                 var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                                 var dateTime = date+' '+time;
-                                
-                                var logType = "resetPIN";
-                                var logData = {
-                                    "cardID":rows[0].cardID,
-                                    "cardType": rows[0].cardType,
-                                    "clientID" : rows[0].clientID,
-                                    "description": "resetPIN",
-                                    "timestamp": dateTime
+
+                                if (fs.existsSync("auth.txt")) {
+                                    // json string for log
+                                    var jsonString = `,{\"logType\":\"resetPIN\",\"logData\":{\"clientID\":\"${clientID}\",\"description\":\"cardsPINReset\",\"timestamp\":\"${dateTime}\",\"cards\":[ ${cards} ]}}`;
+                                } else {
+                                    // json string for log
+                                    var jsonString = `{\"logType\":\"resetPIN\",\"logData\":{\"clientID\":\"${clientID}\",\"description\":\"cardsPINReset\",\"timestamp\":\"${dateTime}\",\"cards\":[ ${cards} ]}}`;
                                 }
+                                
 
                                 // **************************************************
                                 //              Write JSON to textfile       
                                 // -------------------------------------------------  
-                                // var log = {
-                                //     "logType": logType,
-                                //     "logData": logData
-                                // }
-                                //     // add log to textFile
+                                fs.appendFile("auth.txt", jsonString, function(err, data) {
+                                    if (err) console.log(err);
+                                    console.log("Successfully Logged PIN Reset to Log File.");
+                                });
                                 // **************************************************
-
-                                // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-                                request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                                    console.log(body)
-                                    connection.end();
-                                })    
+  
                             } else {
                                 console.log("Client not found");
                             }
@@ -112,8 +124,7 @@ function resetPIN(req, res, next) {
                     });
                 }
             });
-        }
-        
+        }   
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
