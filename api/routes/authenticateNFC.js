@@ -35,7 +35,7 @@ function authenticateNFC(req, res, next) {
         pin: req.query.pin
     };
 
-    req.authenticated = 0;
+    res.locals.authenticated = 0;
 
     if(qs.cardID === undefined || qs.pin === undefined){
         res.status(404).json({
@@ -77,14 +77,14 @@ function authenticateNFC(req, res, next) {
                                     clientID: qs.clientID,
                                     active: rows[0].active
                                 });
-                                req.authenticated = 1;
+                                res.locals.authenticated = 1;
                             } else {
                                 connection.end();
                                 res.status(200).json({
                                     status: "NotAuthorized",
                                     reason: "Incorrect Pin"
                                 });
-                                req.authenticated = 0;
+                                res.locals.authenticated = 0;
                             }
                         }
                         else{
@@ -112,7 +112,6 @@ function authenticateNFC(req, res, next) {
 // ////////////////////////////////////////////  Log Card Auth  //////////////////////////////////////////////////
     
 function logAuthentication(req, res) {
-    console.log(res.locals.authenticated);
     
     let connection = createConnection();
     connection.connect(function(err){
