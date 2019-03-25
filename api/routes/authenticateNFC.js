@@ -35,6 +35,8 @@ function authenticateNFC(req, res, next) {
         pin: req.query.pin
     };
 
+    req.authenticated = 0;
+
     if(qs.cardID === undefined || qs.pin === undefined){
         res.status(404).json({
             error: "GET Failed",
@@ -46,7 +48,8 @@ function authenticateNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(200).json({
+                res.status(404).json({
+                    message: "Database connection issue",
                     error: err,
                 });
                 connection.end();
@@ -55,25 +58,34 @@ function authenticateNFC(req, res, next) {
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(404).json({
-                            error: err
+                            error: "Card ID not in database"
                         });
                         connection.end();
                     }
                     else{
                         if(rows.length > 0){
-                            res.status(200).json({
-                                cardID : rows[0].cardID,
-                                clientID : rows[0].clientID,
-                                active: rows[0].active,
-                                salt: rows[0].salt,
-                                pin: rows[0].pin
-                            });
-                            connection.end();
-                            next();
+                            // let hash = rows[0].salt + qs.pin;
+                            let hash = qs.pin;
+                            if(hash == rows[0].pin){
+                                connection.end();
+                                res.status(200).json({
+                                    status: "Authorized",
+                                    clientID: qs.clientID,
+                                    active: rows[0].active
+                                });
+                                req.authenticated = 1;
+                            } else {
+                                connection.end();
+                                res.status(200).json({
+                                    status: "NotAuthorized",
+                                    reason: "Incorrect Pin"
+                                });
+                                req.authenticated = 0;
+                            }
                         }
                         else{
                             res.status(404).json({
-                                error: "Card id not found"
+                                error: "Card ID not in database"
                             });
                             connection.end();
                         }
@@ -82,6 +94,7 @@ function authenticateNFC(req, res, next) {
             }
         });
     }
+    next();
     console.log("Card Authenticated");
 
     // Used to call "logAuthentication"
@@ -119,10 +132,10 @@ function logAuthentication(req, res) {
                         var logData = {
                             "cardID":rows[0].cardID,
                             "cardType": rows[0].cardType,
-                            "authenticated": "activated",   // ******************************* authenticated?
+                            "authenticated": req.authenticated == 1 ? "Authenticated" : "NotAuthenticated",   // ******************************* authenticated?
                             "timestamp": dateTime
                         }
-                            
+                        // console.log(logData);
         //                 // **************************************************
         //                 //              Write JSON to textfile       
         //                 // -------------------------------------------------  
@@ -135,7 +148,6 @@ function logAuthentication(req, res) {
 
         //                 // send log to reporting  (qs: {"logType":logtype, "logFile": file})
                         request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                            // console.log(err, body);
                             connection.end();
                         });    
                     }
