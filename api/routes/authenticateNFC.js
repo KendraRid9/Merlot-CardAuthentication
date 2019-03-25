@@ -73,18 +73,19 @@ function authenticateNFC(req, res, next) {
                             if(hash == rows[0].pin){
                                 connection.end();
                                 res.status(200).json({
-                                    status: "Authorized",
-                                    clientID: qs.clientID,
-                                    active: rows[0].active
+                                    status: "Authenticated",
+                                    content: qs.clientID
                                 });
                                 res.locals.authenticated = 1;
+                                next();
                             } else {
                                 connection.end();
                                 res.status(200).json({
-                                    status: "NotAuthorized",
-                                    reason: "Incorrect Pin"
+                                    status: "NotAuthenticated",
+                                    content: "Incorrect Pin"
                                 });
                                 res.locals.authenticated = 0;
+                                next();
                             }
                         }
                         else{
@@ -101,7 +102,6 @@ function authenticateNFC(req, res, next) {
             }
         });
     }
-    next();
     console.log("Card Authenticated");
 
     
@@ -136,10 +136,10 @@ function logAuthentication(req, res) {
                         
                         if (fs.existsSync("auth.txt")) {
                             // json string for log
-                            var jsonString = `,{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"authenticated\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+                            var jsonString = `,{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"status\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
                         } else {
                             // json string for log
-                            var jsonString = `{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"authenticated\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+                            var jsonString = `{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"status\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
                         }
                        
 
