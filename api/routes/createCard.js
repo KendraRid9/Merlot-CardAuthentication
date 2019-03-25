@@ -66,35 +66,30 @@ function createConnection(){
                     }
                     else {
 
+                        //get timestamp
                         var today = new Date();
                         var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         var dateTime = date+' '+time;
-                        
-                        var logType = "cardCreateed";
-                        var logData = {
-                            "cardID":rows[0].cardID,
-                            "cardType": rows[0].cardType,
-                            "clientID" : rows[0].clientID,
-                            "description": "activated",
-                            "timestamp": dateTime
+                     
+                        if (fs.existsSync("auth.txt")) {
+                            // json string for log
+                            var jsonString = `,{\"logType\":\"cardCreated\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"clientID\":\"${rows[0].clientID}\",\"description\":\"activated\",\"timestamp\":\"${dateTime}\"}}`;
+                        } else {
+                            // json string for log
+                            var jsonString = `{\"logType\":\"cardCreated\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"clientID\":\"${rows[0].clientID}\",\"description\":\"activated\",\"timestamp\":\"${dateTime}\"}}`;
                         }
+                       
 
                         // **************************************************
                         //              Write JSON to textfile       
                         // -------------------------------------------------  
-                        // var log = {
-                        //     "logType": logType,
-                        //     "logData": logData
-                        // }
-                        //     // add log to textFile
+                        fs.appendFile("auth.txt", jsonString, function(err, data) {
+                            if (err) console.log(err);
+                            console.log("Successfully Logged Card Creation to Log File.");
+                        });
                         // **************************************************
 
-                        // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-                        request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                            console.log(err, body);
-                            connection.end();
-                        })    
                     }
                 });
             }

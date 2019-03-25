@@ -55,12 +55,16 @@ function authenticateNFC(req, res, next) {
                 connection.end();
             }
             else{
+                res.locals.cardID = qs.cardID;
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(404).json({
                             error: "Card ID not in database"
                         });
                         connection.end();
+                        res.locals.authenticated = "0";
+                        // Used to call "logAuthentication"
+                        next();
                     }
                     else{
                         if(rows.length > 0){
@@ -88,6 +92,9 @@ function authenticateNFC(req, res, next) {
                                 error: "Card ID not in database"
                             });
                             connection.end();
+                            res.locals.authenticated = "0";
+                            // Used to call "logAuthentication"
+                            next();
                         }
                     }
                 });
@@ -97,7 +104,6 @@ function authenticateNFC(req, res, next) {
     next();
     console.log("Card Authenticated");
 
-    // Used to call "logAuthentication"
     
 }
 
@@ -106,7 +112,7 @@ function authenticateNFC(req, res, next) {
 // ////////////////////////////////////////////  Log Card Auth  //////////////////////////////////////////////////
     
 function logAuthentication(req, res) {
-    console.log(req.query.cardID);
+    console.log(res.locals.authenticated);
     
     let connection = createConnection();
     connection.connect(function(err){
@@ -115,41 +121,38 @@ function logAuthentication(req, res) {
             connection.end();
         }
         else{
-            var cardID = req.query.cardID;   // cardID should be set in cardAuth when they 
 
-            connection.query(`SELECT * FROM CardAuthentication WHERE cardID = ${cardID}`, (err, rows) => {
+            connection.query(`SELECT * FROM CardAuthentication WHERE cardID = ${res.locals.cardID}`, (err, rows) => {
                 if(err) {
                     console.log("Card ID not found");
                 }
                 else {
                     if(rows.length > 0){
+
+                        //get timestamp
                         var today = new Date();
                         var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         var dateTime = date+' '+time;
                         
-                        var logType = "cardAuthentication";
-                        var logData = {
-                            "cardID":rows[0].cardID,
-                            "cardType": rows[0].cardType,
-                            "authenticated": req.authenticated == 1 ? "Authenticated" : "NotAuthenticated",   // ******************************* authenticated?
-                            "timestamp": dateTime
+                        if (fs.existsSync("auth.txt")) {
+                            // json string for log
+                            var jsonString = `,{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"authenticated\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+                        } else {
+                            // json string for log
+                            var jsonString = `{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"authenticated\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
                         }
-                        // console.log(logData);
-        //                 // **************************************************
-        //                 //              Write JSON to textfile       
-        //                 // -------------------------------------------------  
-        //                 // var log = {
-        //                 //     "logType": logType,
-        //                 //     "logData": logData
-        //                 // }
-        //                 //     // add log to textFile
-        //                 // **************************************************
+                       
 
-        //                 // send log to reporting  (qs: {"logType":logtype, "logFile": file})
-                        request.get({url: "https://safe-journey-59939.herokuapp.com/", qs: {"logType": logType, "logData": logData}}, function(err, response, body) {
-                            connection.end();
-                        });    
+                        // **************************************************
+                        //              Write JSON to textfile       
+                        // -------------------------------------------------  
+                        fs.appendFile("auth.txt", jsonString, function(err, data) {
+                            if (err) console.log(err);
+                            console.log("Successfully Logged Card Authentication to Log File.");
+                        });
+                        // **************************************************
+                            
                     }
                     else {
                         connection.end();
