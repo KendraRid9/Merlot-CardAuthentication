@@ -55,14 +55,15 @@ function createCard(req, res, next)
             activeStatus = 1;
 
             console.log("Created Card");
+            console.log("Pin: " + pin);
             console.log("Pin Hash: " + hashPin);
             console.log("Salt: " + salt);
 
-            let sql = `INSERT INTO clients(clientID,cardType,active,pin,salt) VALUES(?,?,?,?,?)`;
+            let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin,salt) VALUES(?,?,?,?,?)`;
 
             let values = [clientID,cardType,activeStatus,hashPin,salt];
 
-          /*  connection.query(sql,values,(err,results,fields) =>
+            connection.query(sql,values,(err,results,fields) =>
             {
                if(err)
                {
@@ -70,9 +71,10 @@ function createCard(req, res, next)
                }
                else
                {
-                   console.log("Rows Inserted: " + results.affectedRows);
+                   cardID = results.insertId;
+                   console.log("Rows Inserted: " + cardID);
                }
-            });*/
+            });
 
             res.locals.pin = pin;
             res.status(200).json({
