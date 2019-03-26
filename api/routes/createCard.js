@@ -3,7 +3,7 @@ var mysql = require('mysql');
 const router = express.Router();
 const request = require("request");
 var fs = require('fs');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt-nodejs');
 const saltRounds = 10;
 
 
@@ -62,7 +62,7 @@ function createCard(req, res, next)
 
             let values = [clientID,cardType,activeStatus,hashPin,salt];
 
-            connection.query(sql,values,(err,results,fields) =>
+          /*  connection.query(sql,values,(err,results,fields) =>
             {
                if(err)
                {
@@ -72,7 +72,7 @@ function createCard(req, res, next)
                {
                    console.log("Rows Inserted: " + results.affectedRows);
                }
-            });
+            });*/
 
             res.locals.pin = pin;
             res.status(200).json({

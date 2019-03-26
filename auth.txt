@@ -1,1 +1,1 @@
-{"logType":"cardAuthentication","logData":{"cardID":"1","cardType":"NFC","status":"0","timestamp":"2019-3-26 0:2:14"}}
+{"logType":"cardAuthentication","logData":{"cardID":"1","cardType":"NFC","status":"0","timestamp":"2019-3-26 0:2:14"}},{"logType":"cardCreated","logData":{"cardID":"5","cardType":"NFC","clientID":"1003","description":"activated","timestamp":"2019-3-26 19:39:30"}}
