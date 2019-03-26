@@ -18,19 +18,24 @@ https://merlot-card-authentication.herokuapp.com
 ###### Request:
 ```javascript
 var data = {
-    "cardID": "...",
-    "pin": "..."
+    cardID : cardID
+}
+OR
+var data = {
+    cardID : cardID,
+    pin : PIN
 }
 
+
 var options = {
-    hostname: 'https://merlot-card-authentication.herokuapp.com',
-    port: 3000,
-    path: '/authenticateNFC',
-    method: 'POST',
+    hostname : "https://merlot-card-authentication.herokuapp.com",
+    port : 3000,
+    path : "/authenticateNFC",
+    method : "POST",
     body : data,
-    headers: {
-    'Content-Type': 'application/json',
-    'Content-Length': data.length
+    headers : {
+        "Content-Type" : "application/json",
+        "Content-Length" : data.length
     }
  }
 
@@ -38,13 +43,13 @@ var options = {
 ###### Response:
 ```javascript
 {
-    "status":"Authenticated",
-    "content":"cardID"
+    status : "Authenticated",
+    clientID : clientID
 }
 OR
 {
-    "status":"NotAuthenticated",
-    "content":"reason for failure"
+    status : "NotAuthenticated",
+    clientID :"None"
 }
 ```
 ---
@@ -53,31 +58,31 @@ OR
 ###### Request 
 ```javascript
 var data = {
-    "clientID": "...",
+    clientID : clientID
 }
 
 var options = {
-    hostname: 'https://merlot-card-authentication.herokuapp.com',
-    port: 3000,
-    path: '/createCard'OR'/cancelCard'OR'/resetPin',
-    method: 'POST',
+    hostname : "https://merlot-card-authentication.herokuapp.com",
+    port : 3000,
+    path : "/createCard OR /cancelCard",
+    method : "POST",
     body : data,
-    headers: {
-    'Content-Type': 'application/json',
-    'Content-Length': data.length
+    headers : {
+        "Content-Type": "application/json",
+        "Content-Length" : data.length
     }
  }
 ```
 ###### Response:
 ```javascript
 {
-    "status": "success",
-    "message": "card created" OR "card cancelled" OR "pin reset"
+    status : "success",
+    message : "card created OR card cancelled"
 }
 OR
 {
-    "status":"fail",
-    "message":"reason for failure"
+    status :"fail",
+    message : "reason for failure"
 }
 ```
 ---
@@ -86,37 +91,39 @@ OR
 ###### Request 
 ```javascript
 var data = {
-    "ClientID": {{ClientID}},
-    "Type": "card",
-     "Content": {
-        "type" : "new/deactivate/reset"
-        "cardnumber": {{RandomCard}},
-        "pin":{{cardPin}}
+    ClientID : "{{ClientID}}",
+    Type : "card",
+    Content : {
+        type : "new/deactivate/reset",
+        cardnumber : "{{RandomCard}}",
+        pin : "{{cardPin}}"
     }
 }
 
 var options = { 
-    method: 'POST',
-    url: 'http://127.0.0.1:5555',
+    method : "POST",
+    url : "http://127.0.0.1:5555",
     headers: {
-        'Postman-Token': 'fe00621e-2cbe-4120-83c5-1b340d0b541e',
-        'cache-control': 'no-cache',
-        'Content-Type': 'application/json' },
-    body: data
+        "Postman-Token" : "fe00621e-2cbe-4120-83c5-1b340d0b541e",
+        "cache-control" : "no-cache",
+        "Content-Type" : "application/json"
+        
+    },
+    body : data
 };
 ```
 ###### Their Response:
-```
+```javascript
 {
-    "status": "success",
-    "timestamp": "2019-03-25T07:50:27.531Z",
-    "message": "Mail sent successfully"
+    status : "success",
+    timestamp : "2019-03-25T07:50:27.531Z",
+    message : "Mail sent successfully"
 }
 OR
 {
-    "status": "failed",
-    "timestamp": "2019-03-25T07:50:27.531Z",
-    "message": "Invalid Notification Type or Missing arguements"
+    status : "failed",
+    timestamp : "2019-03-25T07:50:27.531Z",
+    message : "Invalid Notification Type or Missing arguements"
 }
 ```
 ---
@@ -125,7 +132,7 @@ OR
 ###### Request 
 ```javascript
 var data = {
-  "logFile":"auth.txt"
+  logFile : "auth.txt"
 }
 
 var options = { 
@@ -135,3 +142,4 @@ var options = {
 ###### Their Response:
 ```javascript
 ```
+---
