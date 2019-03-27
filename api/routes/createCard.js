@@ -38,21 +38,25 @@ function createCard(req, res, next)
 {
     var clientID = req.body.clientID;
     let connection = createConnection();
+    let resStatus = "success";
+    let resMessage = "Card Created";
     connection.connect(function (err)
     {
         if (err)
         {
             console.log(err.message);
+            resStatus = "fail";
+            resMessage = err.message;
         }
         else
         {
             let cardID, cardType, pin, hashPin, salt, activeStatus;
 
             cardType = Math.round(Math.random()) === 1 ? "NFC" : "Bank";
-            pin = Math.floor(1000 + Math.random() * 9000);
+            pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
             salt = bcrypt.genSaltSync(saltRounds);
             hashPin = bcrypt.hashSync(pin,salt);
-            activeStatus = 1;
+            activeStatus = 1; // set active to true
 
             console.log("Created Card");
             console.log("Pin: " + pin);
@@ -67,19 +71,25 @@ function createCard(req, res, next)
             {
                if(err)
                {
-                   return console.error(err.message);
+                   resStatus = "fail";
+                   resMessage = err.message;
+                   console.log(err.message);
                }
                else
                {
                    cardID = results.insertId;
-                   console.log("Rows Inserted: " + cardID);
+                   console.log("Inserted Card: " + cardID);
                }
             });
 
             res.locals.pin = pin;
+
             res.status(200).json({
-                message: "Card Created"
+                status: resStatus,
+                message: resMessage
             });
+
+          //  res.send();
             connection.end();
             next();
         }
