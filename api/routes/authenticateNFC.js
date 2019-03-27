@@ -48,7 +48,7 @@ function authenticateGetNFC(req, res, next) {
         res.locals.pin = '';
     }
     
-    if(qs.cardID === undefined && qs.pin === undefined){
+    if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
         res.status(404).json({
             error: "GET Failed",
             message: "Expected clientID"
@@ -62,7 +62,7 @@ function authenticateGetNFC(req, res, next) {
             if(err){
                 res.status(404).json({
                     message: "Database connection issue on NFC module",
-                    error: "HERE",
+                    error: err.message
                 });
                 connection.end();
             }else{
@@ -196,7 +196,7 @@ function authenticatePostNFC(req, res, next) {
         res.locals.pin = '';
     }
     
-    if(qs.cardID === undefined && qs.pin === undefined){
+    if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
         res.status(404).json({
             error: "POST Failed",
             message: "Expected clientID"
