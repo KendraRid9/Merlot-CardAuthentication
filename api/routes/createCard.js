@@ -4,7 +4,7 @@ const router = express.Router();
 const request = require("request");
 var fs = require('fs');
 const bcrypt = require('bcrypt-nodejs');
-const saltRounds = 10;
+
 
 
 // Create connection to JawsDB Database
@@ -52,16 +52,16 @@ function createCard(req, res, next)
         {
             let cardID, cardType, pin, hashPin, salt, activeStatus;
 
-            cardType = Math.round(Math.random()) === 1 ? "NFC" : "Bank";
+            cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
             pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
-            salt = bcrypt.genSaltSync(saltRounds);
+            salt = bcrypt.genSaltSync();
             hashPin = bcrypt.hashSync(pin,salt);
             activeStatus = 1; // set active to true
 
-            console.log("Created Card");
+           /* console.log("Created Card");
             console.log("Pin: " + pin);
             console.log("Pin Hash: " + hashPin);
-            console.log("Salt: " + salt);
+            console.log("Salt: " + salt);*/
 
             let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
 
@@ -96,17 +96,6 @@ function createCard(req, res, next)
     });
 }
 
-function getSalt()
-{
-    var result = "";
-    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-    for (var i = 0; i < 3; i++)
-    {
-        result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-    }
-    return result;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
