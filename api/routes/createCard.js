@@ -63,9 +63,9 @@ function createCard(req, res, next)
             console.log("Pin Hash: " + hashPin);
             console.log("Salt: " + salt);
 
-            let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin,salt) VALUES(?,?,?,?,?)`;
+            let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
 
-            let values = [clientID,cardType,activeStatus,hashPin,salt];
+            let values = [clientID,cardType,activeStatus,hashPin];
 
             connection.query(sql,values,(err,results,fields) =>
             {
