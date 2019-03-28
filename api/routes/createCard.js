@@ -40,6 +40,19 @@ function createCard(req, res, next)
     let connection = createConnection();
     let resStatus = "success";
     let resMessage = "Card Created";
+
+    if(clientID === undefined || clientID === "")
+    {
+        console.log("No ClientID Received");
+        res.status(200).json({
+            status: "fail",
+            message: "No ClientID received"
+        });
+
+        connection.end();
+       // next();
+        return;
+    }
     connection.connect(function (err)
     {
         if (err)
