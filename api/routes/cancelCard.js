@@ -41,9 +41,14 @@ function createConnection(){
                 if(err) {
                     console.log(err.message);
                 } else {
-                    // ********************************
-                        // Cancel Cards Code Here... 
-                    // ********************************
+
+                    connection.query(`UPDATE CardAuthentication SET active = 0 WHERE clientID = ${clientID}`, function (err, result) 
+                    {
+                        if (err) throw err;
+                        console.log(result.affectedRows + " record(s) updated");
+                    }
+                );
+
                     res.status(200).json({
                         message: "Card cancelled"
                     });
