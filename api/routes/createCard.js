@@ -66,11 +66,12 @@ function createCard(req, res, next)
             let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
 
             let values = [clientID,cardType,activeStatus,hashPin];
-
+            cardID = -1;
             connection.query(sql,values,(err,results,fields) =>
             {
                if(err)
                {
+
                    resStatus = "fail";
                    resMessage = err.message;
                    console.log(err.message);
@@ -83,13 +84,14 @@ function createCard(req, res, next)
             });
 
             res.locals.pin = pin;
+            res.locals.clientID = clientID;
+            res.locals.cardID = cardID;
 
             res.status(200).json({
                 status: resStatus,
                 message: resMessage
             });
 
-          //  res.send();
             connection.end();
             next();
         }
