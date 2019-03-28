@@ -43,7 +43,7 @@ function createCard(req, res, next)
 
     if(clientID === undefined || clientID === "")
     {
-        console.log("No ClientID Received")
+        console.log("No ClientID Received");
         res.status(200).json({
             status: "fail",
             message: "No ClientID received"
