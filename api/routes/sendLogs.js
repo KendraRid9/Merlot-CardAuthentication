@@ -20,9 +20,9 @@ var querystring = require('querystring')
        
         if(err) {
           console.log(err.message);
-          res.status(404).json({
-            message: "could not read log file",
-            error: err.message
+          res.status(200).json({
+            status: "fail",
+            message: "no logs to send"
           });
         }
         else{
@@ -61,8 +61,19 @@ var querystring = require('querystring')
             else {
               console.log(response.statusCode);
               fs.unlink("logs.txt", (err) => {
-                if(err) console.log(err.message);
-                else console.log("Log File Deleted");
+                if(err){
+                  console.log(err.message);
+                  res.status(200).json({
+                    status: "fail",
+                    message: "did not send Logs"
+                  });
+                } else {
+                  console.log("Log File Deleted");
+                  res.status(200).json({
+                    status: "success",
+                    message: "sent Logs"
+                  });
+                }
               });
 
               // send response back to /sendLogs request to notify them that logs were successfully sent
@@ -76,7 +87,7 @@ var querystring = require('querystring')
 
 ////////////////////////////////////////////  Handle POST request  /////////////////////////////////////////////
 
-    router.post('/', (res, req) => {
+    router.post('/', (req, res) => {
 
        // read log objects from file
       fs.readFile('logs.txt', (err, contents) => {
@@ -84,8 +95,8 @@ var querystring = require('querystring')
         if(err) {
           console.log(err.message);
           res.status(404).json({
-            message: "could not read log file",
-            error: err.message
+            status: "fail",
+            message: "no logs to send"
           });
         }
         else{
@@ -124,8 +135,19 @@ var querystring = require('querystring')
             else {
               console.log(response.statusCode);
               fs.unlink("logs.txt", (err) => {
-                if(err) console.log(err.message);
-                else console.log("Log File Deleted");
+                if(err){
+                  console.log(err.message);
+                  res.status(200).json({
+                    status: "fail",
+                    message: "did not send Logs"
+                  });
+                } else {
+                  console.log("Log File Deleted");
+                  res.status(200).json({
+                    status: "success",
+                    message: "sent Logs"
+                  });
+                }
               });
 
               // send response back to /sendLogs request to notify them that logs were successfully sent
