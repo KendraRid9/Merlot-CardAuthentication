@@ -66,77 +66,63 @@ function createCard(req, res, next)
         }
         else
         {
-            //Test if client exists
-            let query = 'Select * from CardAuthentication where clientID =' + clientID;
-            connection.query(query, function(err, rows){
-                if (rows.length === 0)
+            let cardID, cardType, pin, hashPin, salt, activeStatus;
+
+            cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
+            pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
+            salt = bcrypt.genSaltSync();
+            hashPin = bcrypt.hashSync(pin,salt);
+            activeStatus = 1; // set active to true
+
+        /* console.log("Created Card");
+            console.log("Pin: " + pin);
+            console.log("Pin Hash: " + hashPin);
+            console.log("Salt: " + salt);*/
+
+            res.locals.pin = pin;
+            res.locals.clientID = clientID;    
+            res.locals.cardType = cardType;
+
+            let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
+
+            let values = [clientID,cardType,activeStatus,hashPin];
+            cardID = -1;
+            connection.query(sql,values,(err,results,fields) =>
+            {
+                if(err)
                 {
                     res.status(200).json({
                         status: "fail",
-                        message: 'client not found in database'
+                        message: "no clientID was found"
                     });
-                    console.log('client does not exist');
+
+                    resStatus = "fail";
+                    resMessage = err.message;
+                    console.log(err.message);
+
                     connection.end();
-                } else {
-                    let cardID, cardType, pin, hashPin, salt, activeStatus;
+                    res.locals.description = err.message;
+                    res.locals.success = "0";
+                    res.locals.cardID = "-1";
+                    next();
+                }
+                else
+                {
+                    res.status(200).json({
+                        status: resStatus,
+                        message: resMessage
+                    });
 
-                    cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
-                    pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
-                    salt = bcrypt.genSaltSync();
-                    hashPin = bcrypt.hashSync(pin,salt);
-                    activeStatus = 1; // set active to true
-
-                /* console.log("Created Card");
-                    console.log("Pin: " + pin);
-                    console.log("Pin Hash: " + hashPin);
-                    console.log("Salt: " + salt);*/
-
-                    res.locals.pin = pin;
-                    res.locals.clientID = clientID;    
-                    res.locals.cardType = cardType;
-
-                    let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
-
-                    let values = [clientID,cardType,activeStatus,hashPin];
-                    cardID = -1;
-                    connection.query(sql,values,(err,results,fields) =>
-                    {
-                        if(err)
-                        {
-                            res.status(200).json({
-                                status: "fail",
-                                message: "no clientID was found"
-                            });
-
-                            resStatus = "fail";
-                            resMessage = err.message;
-                            console.log(err.message);
-
-                            connection.end();
-                            res.locals.description = err.message;
-                            res.locals.success = "0";
-                            res.locals.cardID = "-1";
-                            next();
-                        }
-                        else
-                        {
-                            res.status(200).json({
-                                status: resStatus,
-                                message: resMessage
-                            });
-
-                            cardID = results.insertId;
-                            console.log("inserted card: " + cardID);
-                            
-                            connection.end();
-                            res.locals.description = "activated";
-                            res.locals.success = "1";
-                            res.locals.cardID = cardID;
-                            next();  
-                        }
-                    });   
-               }
-            });
+                    cardID = results.insertId;
+                    console.log("inserted card: " + cardID);
+                    
+                    connection.end();
+                    res.locals.description = "activated";
+                    res.locals.success = "1";
+                    res.locals.cardID = cardID;
+                    next();  
+                }
+            });   
         }
     });
 }
