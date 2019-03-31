@@ -80,16 +80,16 @@ function createCard(req, res, next)
                 } else {
                     let cardID, cardType, pin, hashPin, salt, activeStatus;
 
-            cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
-            pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
-            salt = bcrypt.genSaltSync();
-            hashPin = bcrypt.hashSync(pin,salt);
-            activeStatus = 1; // set active to true
+                    cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
+                    pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
+                    salt = bcrypt.genSaltSync();
+                    hashPin = bcrypt.hashSync(pin,salt);
+                    activeStatus = 1; // set active to true
 
-           /* console.log("Created Card");
-            console.log("Pin: " + pin);
-            console.log("Pin Hash: " + hashPin);
-            console.log("Salt: " + salt);*/
+                /* console.log("Created Card");
+                    console.log("Pin: " + pin);
+                    console.log("Pin Hash: " + hashPin);
+                    console.log("Salt: " + salt);*/
 
                     res.locals.pin = pin;
                     res.locals.clientID = clientID;    
@@ -134,34 +134,9 @@ function createCard(req, res, next)
                             res.locals.cardID = cardID;
                             next();  
                         }
-                    });
-        
-                    connection.end();
-                    res.locals.description = err.message;
-                    res.locals.success = "0";
-                    res.locals.cardID = "-1";
-                    next();
-                   
-                   
-               }
-               else
-               {
-                    cardID = results.insertId;
-                    console.log("Inserted Card: " + cardID);
-
-                    res.status(200).json({
-                        status: resStatus,
-                        message: resMessage
-                    });
-        
-                    connection.end();
-                    res.locals.description = "activated";
-                    res.locals.success = "1";
-                    res.locals.cardID = cardID;
-                    next();              
+                    });   
                }
             });
-
         }
     });
 }
