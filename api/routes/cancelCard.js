@@ -4,7 +4,6 @@ const router = express.Router();
 const request = require("request");
 var fs = require('fs');
 
-
 // // Create connection to JawsDB Database
 // var connection = mysql.createConnection(process.env.JAWSDB_URL);
 
@@ -32,32 +31,56 @@ function createConnection(){
 
     function cancelCard(req, res, next) {
         if(req.query.clientID === undefined || req.query.clientID == ''){
-            res.status(404).json({
-                message: "No clientID was found"
+            res.status(200).json({
+                status: "fail", 
+                message: "no clientID was found"
             });
-        } else {
+        } else {  
             let connection = createConnection();
+            let clientID = req.query.clientID;
+            res.locals.clientID = clientID;
             connection.connect(function(err) {
                 if(err) {
-                    console.log(err.message);
-                } else {
-
-                    connection.query(`UPDATE CardAuthentication SET active = 0 WHERE clientID = ${clientID}`, function (err, result) 
-                    {
-                        if (err) throw err;
-                        console.log(result.affectedRows + " record(s) updated");
-                    }
-                );
-
                     res.status(200).json({
-                        message: "Card cancelled"
+                        status: "fail", 
+                        message: "database connection issue on NFC module",
                     });
-                    connection.end();
-                    next();
+                    console.log(err.message);
+                    connection.end(); 
+                } else {
+                    let query = 'Select * from CardAuthentication where clientID =' + clientID;
+                    connection.query(query, function(err, rows){
+                        if(rows.length == 0){
+                            res.status(200).json({
+                                status: "fail", 
+                                message: "client not found in database",
+                            });
+                            connection.end();
+                        } else {
+                            connection.query(`UPDATE CardAuthentication SET active = 0 WHERE clientID = ${clientID}`, function (err, result) 
+                            {
+                                if (err) {
+                                    console.log(err.message);
+                                    res.status(200).json({
+                                        status: "fail", 
+                                        message: "database connection issue on NFC module",
+                                    });
+                                    connection.end();
+                                } else {
+                                    console.log(result.affectedRows + " record(s) updated");
+                                    res.status(200).json({
+                                        status: "success", 
+                                        message: "card cancelled"
+                                    });
+                                    connection.end();
+                                }   
+                            });
+                        }
+                    });
                 }
             });
         }
-        
+        next();
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////// 

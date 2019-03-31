@@ -49,9 +49,9 @@ function authenticateGetNFC(req, res, next) {
     }
     
     if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
-        res.status(404).json({
+        res.status(200).json({
             error: "GET Failed",
-            message: "Expected cardID"
+            status: "expected cardID"
         });
     }
 
@@ -60,9 +60,9 @@ function authenticateGetNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(404).json({
-                    message: "Database connection issue on NFC module",
-                    error: err.message
+                res.status(200).json({
+                    status: "database connection issue on NFC module",
+                    error: err.status
                 });
                 connection.end();
             }else{
@@ -72,7 +72,7 @@ function authenticateGetNFC(req, res, next) {
                     if(err){
                         res.status(200).json({
                             status: "NotAuthenticated",
-                            clientID: "None"
+                            clientID: "none"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -100,7 +100,7 @@ function authenticateGetNFC(req, res, next) {
                     } else {
                         res.status(200).json({
                             status: "NotAuthenticated",
-                            clientID: "None"
+                            clientID: "none"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -116,8 +116,8 @@ function authenticateGetNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(404).json({
-                    message: "Database connection issue on NFC module",
+                res.status(200).json({
+                    status: "database connection issue on NFC module",
                     error: err,
                 });
                 connection.end();
@@ -168,8 +168,6 @@ function authenticateGetNFC(req, res, next) {
                             res.locals.authenticated = "1"
                             next();
                         }
-                    } else {
-                        
                     }
                 });
             }
@@ -177,9 +175,9 @@ function authenticateGetNFC(req, res, next) {
     }
     //Any other error that may occur
     else {
-        res.status(404).json({
+        res.status(200).json({
             error: "GET Failed",
-            message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
+            status: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
         connection.end();
     } 
@@ -206,9 +204,9 @@ function authenticatePostNFC(req, res, next) {
     }
     
     if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
-        res.status(404).json({
+        res.status(200).json({
             error: "POST Failed",
-            message: "Expected cardID"
+            status: "Expected cardID"
         });
     }
 
@@ -217,9 +215,9 @@ function authenticatePostNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(404).json({
-                    message: "Database connection issue on NFC module",
-                    error: err.message
+                res.status(200).json({
+                    status: "Database connection issue on NFC module",
+                    error: err.status
                 });
                 connection.end();
             }else{
@@ -273,9 +271,8 @@ function authenticatePostNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(404).json({
-                    message: "Database connection issue on NFC module",
-                    error: err,
+                res.status(200).json({
+                    status: "Database connection issue on NFC module",
                 });
                 connection.end();
             }else{
@@ -341,9 +338,9 @@ function authenticatePostNFC(req, res, next) {
     }
     //Any other error that may occur
     else {
-        res.status(404).json({
+        res.status(200).json({
             error: "POST Failed",
-            message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
+            status: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
         connection.end();
     } 
@@ -358,7 +355,7 @@ function logAuthentication(req, res) {
     let connection = createConnection();
     connection.connect(function(err){
         if(err){
-            console.log(err.message);
+            console.log(err.status);
             connection.end();
         }
         else{

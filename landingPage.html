@@ -27,87 +27,65 @@
                         <th scope="row">1</th>
                         <td>AuthenticateNFC</td>
                         <td>cardID, pin</td>
-                        <td>https://merlot-card-authentication.herokuapp.com/authenticateNFC?cardID=1&pin=123</td>
+                        <td>https://merlot-card-authentication.herokuapp.com/authenticateNFC?cardID=44&pin=4553
+                            <br>
+                            https://merlot-card-authentication.herokuapp.com/authenticateNFC?cardID=44
+                        </td>
                         <td>
-                            <b>{"status":"Authorized","active":1}</b>
+                            {"status":"Authenticated","clientID":2}
+
                             <br>
-                            {"error":"GET Failed","message":"Expected different JSON data","paramsReceived":{"cardID":""}}
+                            <b>Errors:</b>
                             <br>
-                            {"status":"NotAuthorized","reason":"Incorrect Pin"}
+                            {"error":"GET Failed","status":"expected cardID"}
+                            <br>
+                            {"status":"NotAuthenticated","clientID":"none"}
+                            <br>
+                            {"status":"NotAuthenticated","clientID":2}
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">2</th>
                         <td>createCard</td>
-                        <td>cardID</td>
-                        <td>https://merlot-card-authentication.herokuapp.com/createCard</td>
-                        <td></td>
-                    </tr>
+                        <td>clientID</td>
+                        <td>https://merlot-card-authentication.herokuapp.com/cancelCard?clientID=2</td>
+                        <td>
+                            {"status":"success","message":"card created"}
+                            <br>
+                            <b>Errors:</b>
+                            <br>
+                            {"status":"fail","message":"no clientID received"}
+                            <br>
+                            {"status":"fail","message":"client not found in database"}
+                        </td>
+                    </tr> 
                     <tr>
                         <th scope="row">3</th>
                         <td>cancelCard</td>
-                        <td>cardID</td>
-                        <td>https://merlot-card-authentication.herokuapp.com/cancelCard</td>
-                        <td></td>
+                        <td>clientID</td>
+                        <td>https://merlot-card-authentication.herokuapp.com/createCard?clientID=2</td>
+                        <td>
+                            {"status":"success","message":"card cancelled"}
+                            <br>
+                            <b>Errors:</b>
+                            <br>
+                            {"status":"fail","message":"no clientID was found"}
+                            <br>
+                            {"status":"fail","message":"client not found in database"}
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row">4</th>
-                        <td>resetPin</td>
-                        <td>pin</td>
-                        <td>https://merlot-card-authentication.herokuapp.com/resetPin</td>
-                        <td></td>
-                    </tr>  
-                    <tr>
-                        <th scope="row">5</th>
                         <td>sendLogs</td>
-                        <td>cardID</td>
+                        <td>None</td>
                         <td>https://merlot-card-authentication.herokuapp.com/sendLogs</td>
                         <td>
-                            <br>
+                            {"status":"sucess","message":"logs sent"}
                         </td>
                     </tr>                  
                 </tbody>
             </table>
         </div>
-
-        <div class="container mt-5">
-                <div class="row">
-                    <div class="col-6 mx-auto"><h3>General error messages</h3></div>
-                </div>
-        </div>
-        <div class="container mt-3">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Error</th>
-                        <th scope="col">Meaning</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>{"error":{"message":"Not found"}}</td>
-                        <td>An invalid route is being used, cannot be found. The link that is being used is not using a valid route.</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>{"error":"GET Failed","message":"Expected different JSON data","paramsReceived":{}}</td>
-                        <td>A correct route is being used but no, or too few parameters are being used.</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>{"error":"Card ID not in database"}</td>
-                        <td>Correct route and parameters provided but incorrect values provided.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        
-
-
-
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
