@@ -80,53 +80,65 @@ function createCard(req, res, next)
                 } else {
                     let cardID, cardType, pin, hashPin, salt, activeStatus;
 
-                    cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
-                    pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
-                    salt = bcrypt.genSaltSync();
-                    hashPin = bcrypt.hashSync(pin,salt);
-                    activeStatus = 1; // set active to true
+            cardType = (Math.round(Math.random()) === 1) ? "NFC" : "Bank";
+            pin = Math.floor(1000 + Math.random() * 9000); // generate random 4 digit pin
+            salt = bcrypt.genSaltSync();
+            hashPin = bcrypt.hashSync(pin,salt);
+            activeStatus = 1; // set active to true
 
-                /* console.log("Created Card");
-                    console.log("Pin: " + pin);
-                    console.log("Pin Hash: " + hashPin);
-                    console.log("Salt: " + salt);*/
+           /* console.log("Created Card");
+            console.log("Pin: " + pin);
+            console.log("Pin Hash: " + hashPin);
+            console.log("Salt: " + salt);*/
 
-                    let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
+            res.locals.pin = pin;
+            res.locals.clientID = clientID;    
+            res.locals.cardType = cardType;
 
-                    let values = [clientID,cardType,activeStatus,hashPin];
-                    cardID = -1;
-                    connection.query(sql,values,(err,results,fields) =>
-                    {
-                        if(err)
-                        {
-                            res.status(200).json({
-                                status: "fail",
-                                message: "no clientID was found"
-                            });
-                            resStatus = "fail";
-                            resMessage = err.message;
-                            console.log(err.message);
-                            connection.end();
-                        }
-                        else
-                        {
-                            res.locals.pin = pin;
-                            res.locals.clientID = clientID;
-                            res.locals.cardID = cardID;
+            let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
 
-                            res.status(200).json({
-                                status: resStatus,
-                                message: resMessage
-                            });
+            let values = [clientID,cardType,activeStatus,hashPin];
+            cardID = -1;
+            connection.query(sql,values,(err,results,fields) =>
+            {
+               if(err)
+               {
 
-                            connection.end();
-                            cardID = results.insertId;
-                            console.log("inserted card: " + cardID);
-                        }
+                    resStatus = "fail";
+                    resMessage = err.message;
+                    console.log(err.message);
+
+                    res.status(200).json({
+                        status: resStatus,
+                        message: resMessage
                     });
+        
+                    connection.end();
+                    res.locals.description = err.message;
+                    res.locals.success = "0";
+                    res.locals.cardID = "-1";
                     next();
-                }
+                   
+                   
+               }
+               else
+               {
+                    cardID = results.insertId;
+                    console.log("Inserted Card: " + cardID);
+
+                    res.status(200).json({
+                        status: resStatus,
+                        message: resMessage
+                    });
+        
+                    connection.end();
+                    res.locals.description = "activated";
+                    res.locals.success = "1";
+                    res.locals.cardID = cardID;
+                    next();              
+               }
             });
+
         }
     });
 }
@@ -138,41 +150,50 @@ function createCard(req, res, next)
 
 function logCreate(req, res)
 {
-    let connection = createConnection();
-    connection.connect(function (err)
-    {
-        if (err)
-        {
-            console.log(err.message);
-            connection.end();
+    if(res.locals.clientID != '' && res.locals.clientID !== undefined){
+
+        //get timestamp
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date + ' ' + time;
+        
+        var log = {
+            "logType" : "cardCreated",
+            "cardID" : res.locals.cardID,
+            "cardType" : res.locals.cardType,
+            "clientID" : res.locals.clientID,
+            "description" : res.locals.description,
+            "success" : res.locals.success,
+            "timestamp" : dateTime
         }
-        else
-        {
-            connection.query(`SELECT * FROM CardAuthentication ORDER BY cardID DESC LIMIT 1`, (err, rows) =>
-            {
-                if (err)
-                {
-                    console.log("Card ID not found");
-                }
-                else
-                {
 
-                    //get timestamp
-                    var today = new Date();
-                    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                    var dateTime = date + ' ' + time;
+        if (fs.existsSync("logs.txt")) {
+            // json string for log
+            // var jsonString = `,{\"logType\":\"cardAuthentication\",\"cardID\":\"${res.locals.cardID}\",\"cardType\":\"${res.locals.cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"${res.locals.description}\",\"success\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+            
+            var jsonString = "," + JSON.stringify(log);
+        
+        } else {
+            // json string for log
+            //var jsonString = `{\"logType\":\"cardAuthentication\",\"cardID\":\"${res.locals.cardID}\",\"cardType\":\"${res.locals.cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"${res.locals.description}\",\"success\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+            
+            var jsonString = JSON.stringify(log);
+        }
+        
 
-                    if (fs.existsSync("auth.txt"))
-                    {
-                        // json string for log
-                        var jsonString = `,{\"logType\":\"cardCreated\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"clientID\":\"${rows[0].clientID}\",\"description\":\"activated\",\"timestamp\":\"${dateTime}\"}}`;
-                    }
-                    else
-                    {
-                        // json string for log
-                        var jsonString = `{\"logType\":\"cardCreated\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"clientID\":\"${rows[0].clientID}\",\"description\":\"activated\",\"timestamp\":\"${dateTime}\"}}`;
-                    }
+        // **************************************************
+        //              Write JSON to textfile       
+        // -------------------------------------------------  
+        fs.appendFile("logs.txt", jsonString, function(err, data) {
+            if (err) console.log(err);
+            else {
+                 console.log("Successfully Logged Card Creation to Log File.");
+            }
+        });
+        // **************************************************
+    }
+}
 
 
                     // **************************************************

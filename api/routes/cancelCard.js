@@ -35,7 +35,9 @@ function createConnection(){
                 status: "fail", 
                 message: "no clientID was found"
             });
-        } else {  
+        } else {
+            var clientID = req.query.clientID;
+            res.locals.clientID = clientID;
             let connection = createConnection();
             let clientID = req.query.clientID;
             res.locals.clientID = clientID;
@@ -89,19 +91,19 @@ function createConnection(){
     
     function logCancel(req, res) {
 
-        let connection = createConnection();
-
-        var clientID = req.query.clientID;   // clientID should be set in cancelCard when they
-        
-        if(clientID === undefined || clientID ===''){
-            console.log('Client ID not found')
-        }else {
+        if(res.locals.clientID !== undefined && res.locals.clientID !== ''){
+            
+            let connection = createConnection();
             connection.connect(function(err) {
                 if(err){
-                    console.log(err.message);
-                }
-                else {
-                    connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${clientID}`, (err, rows) => {
+                    res.status(404).json({
+                        message: "Could not log card cancellation. Database connection issue on NFC module",
+                        error: err.message
+                    });
+                    connection.end();
+                } else {
+
+                    connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${res.locals.clientID}`, (err, rows) => {
                         if(err){
                            console.log("Client not found");
                            connection.end();
@@ -109,43 +111,72 @@ function createConnection(){
                         else {
 
                             if(rows.length > 0) {
-        
-                                var cards = "";
-        
-                                // iterate for all the rows in result
-                                for (var i = 0; i < rows.length; i++) {
-                                    cards += "{";
-                                    cards += `\"cardID\": \"${rows[i].cardID}\",`;
-                                    cards += `\"cardType\": \"${rows[i].cardType}\"`;    // ADDING "," ?????
-                                    cards += "}"
-                                    if(i < (rows.length-1)){
-                                        cards += ","
-                                    }
-                                }
-        
+                                
                                 //get timestamp
                                 var today = new Date();
                                 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                                 var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                                var dateTime = date+' '+time;
+                                var dateTime = date + ' ' + time;
+
+                                // iterate for all the rows in result
+                                for (var i = 0; i < rows.length; i++) {
+
+                                    if(rows[i].active == '0') {
+                                        var log = {
+                                            "logType" : "cardCancelled",
+                                            "cardID" : rows[i].cardID,
+                                            "cardType" : rows[i].cardType,
+                                            "clientID" : res.locals.clientID,
+                                            "description" : "de-activated",
+                                            "success" : "1",
+                                            "timestamp" : dateTime
+                                        }
+                                        if (fs.existsSync("logs.txt")) {
+                                            // json string for log
+                                            //var jsonString = `,{\"logType\":\"cardCancellation\",\"cardID\":\"${rows[i].cardID}\",\"cardType\":\"${rows[i].cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"de-activated\",\"success\":\"1\",\"timestamp\":\"${dateTime}\"}}`;
+                                        
+                                            var jsonString = "," + JSON.stringify(log);
+                                        } else {
+                                            // json string for log
+                                            //var jsonString = `{\"logType\":\"cardCancellation\",\"cardID\":\"${rows[i].cardID}\",\"cardType\":\"${rows[i].cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"de-activated\",\"success\":\"1\",\"timestamp\":\"${dateTime}\"}}`;
+                                        
+                                            var jsonString = JSON.stringify(log);
+                                        }
+
+                                    } else {
+                                        var log = {
+                                            "logType" : "cardCancelled",
+                                            "cardID" : rows[i].cardID,
+                                            "cardType" : rows[i].cardType,
+                                            "clientID" : res.locals.clientID,
+                                            "description" : "error",
+                                            "success" : "0",
+                                            "timestamp" : dateTime
+                                        }
+
+                                        if (fs.existsSync("logs.txt")) {
+                                            // json string for log
+                                            //var jsonString = `,{\"logType\":\"cardCancellation\",\"cardID\":\"${rows[i].cardID}\",\"cardType\":\"${rows[i].cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"de-activated\",\"success\":\"1\",\"timestamp\":\"${dateTime}\"}}`;
+                                        
+                                            var jsonString = "," + JSON.stringify(log);
+                                        } else {
+                                            // json string for log
+                                            //var jsonString = `{\"logType\":\"cardCancellation\",\"cardID\":\"${rows[i].cardID}\",\"cardType\":\"${rows[i].cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"de-activated\",\"success\":\"1\",\"timestamp\":\"${dateTime}\"}}`;
+                                        
+                                            var jsonString = JSON.stringify(log);
+                                        }
+                                    }
+
+                                    // **************************************************
+                                    //              Write JSON to textfile       
+                                    // -------------------------------------------------  
+                                    fs.appendFile("logs.txt", jsonString, function(err, data) {
+                                        if (err) console.log(err.message);
+                                        console.log("Successfully Logged Card Cancellation to Log File.");
+                                    });
+                                    // **************************************************
+                                }  
         
-                                if (fs.existsSync("auth.txt")) {
-                                    // json string for log
-                                    var jsonString = `,{\"logType\":\"cardsCancelled\",\"logData\":{\"clientID\":\"${clientID}\",\"description\":\"deactivated\",\"timestamp\":\"${dateTime}\",\"cards\":[ ${cards} ]}}`;
-                                } else {
-                                    // json string for log
-                                    var jsonString = `{\"logType\":\"cardsCancelled\",\"logData\":{\"clientID\":\"${clientID}\",\"description\":\"deactivated\",\"timestamp\":\"${dateTime}\",\"cards\":[ ${cards} ]}}`;
-                                }
-                            
-        
-                                // **************************************************
-                                //              Write JSON to textfile       
-                                // -------------------------------------------------  
-                                fs.appendFile("auth.txt", jsonString, function(err, data) {
-                                    if (err) console.log(err.message);
-                                    console.log("Successfully Logged Card Cancellation to Log File.");
-                                });
-                                // **************************************************
                             } else {
                                 console.log("Client not found");
                             }
