@@ -356,53 +356,47 @@ function authenticatePostNFC(req, res, next) {
     
 function logAuthentication(req, res) {
     
-    let connection = createConnection();
-    connection.connect(function(err){
-        if(err){
-            console.log(err.status);
-            connection.end();
+    if(res.locals.cardID != '' && res.locals.cardID !== undefined){
+
+        //get timestamp
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date+' '+time;
+        
+        var log = {
+            "logType" : "cardAuthentication",
+            "cardID" : res.locals.cardID,
+            "cardType" : res.locals.cardType,
+            "clientID" : res.locals.clientID,
+            "description" : res.locals.description,
+            "success" : res.locals.authenticated,
+            "timestamp" : dateTime
         }
-        else{
 
-            connection.query(`SELECT * FROM CardAuthentication WHERE cardID = ${res.locals.cardID}`, (err, rows) => {
-                if(err) {
-                    console.log("Card ID not found");
-                }
-                else {
-                    if(rows.length > 0){
-
-                        //get timestamp
-                        var today = new Date();
-                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                        var dateTime = date+' '+time;
-                        
-                        if (fs.existsSync("auth.txt")) {
-                            // json string for log
-                            var jsonString = `,{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"status\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
-                        } else {
-                            // json string for log
-                            var jsonString = `{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"status\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
-                        }
+        if (fs.existsSync("logs.txt")) {
+            // json string for log
+            //var jsonString = `,{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"status\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+        
+            var jsonString = "," + JSON.stringify(log);
+        } else {
+            // json string for log
+            //var jsonString = `{\"logType\":\"cardAuthentication\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"status\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+        
+            var jsonString = JSON.stringify(log);
+        }
                        
 
-                        // **************************************************
-                        //              Write JSON to textfile       
-                        // -------------------------------------------------  
-                        fs.appendFile("auth.txt", jsonString, function(err, data) {
-                            if (err) console.log(err);
-                            console.log("Successfully Logged Card Authentication to Log File.");
-                        });
-                        // **************************************************
+        // **************************************************
+        //              Write JSON to textfile       
+        // -------------------------------------------------  
+        fs.appendFile("logs.txt", jsonString, function(err, data) {
+            if (err) console.log(err);
+            console.log("successfully logged card authentication to log file.");
+        });
+        // **************************************************
                             
-                    }
-                    else {
-                        connection.end();
-                    }
-                }
-            });
-        }
-   });
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

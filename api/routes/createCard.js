@@ -75,7 +75,7 @@ function createCard(req, res, next)
                         status: "fail",
                         message: 'client not found in database'
                     });
-                    console.log('client Does not exist');
+                    console.log('client does not exist');
                     connection.end();
                 } else {
                     let cardID, cardType, pin, hashPin, salt, activeStatus;
@@ -91,6 +91,10 @@ function createCard(req, res, next)
                     console.log("Pin Hash: " + hashPin);
                     console.log("Salt: " + salt);*/
 
+                    res.locals.pin = pin;
+                    res.locals.clientID = clientID;    
+                    res.locals.cardType = cardType;
+
                     let sql = `INSERT INTO CardAuthentication(clientID,cardType,active,pin) VALUES(?,?,?,?)`;
 
                     let values = [clientID,cardType,activeStatus,hashPin];
@@ -103,25 +107,32 @@ function createCard(req, res, next)
                                 status: "fail",
                                 message: "no clientID was found"
                             });
+
                             resStatus = "fail";
                             resMessage = err.message;
                             console.log(err.message);
+
                             connection.end();
+                            res.locals.description = err.message;
+                            res.locals.success = "0";
+                            res.locals.cardID = "-1";
+                            next();
                         }
                         else
                         {
-                            res.locals.pin = pin;
-                            res.locals.clientID = clientID;
-                            res.locals.cardID = cardID;
-
                             res.status(200).json({
                                 status: resStatus,
                                 message: resMessage
                             });
 
-                            connection.end();
                             cardID = results.insertId;
                             console.log("inserted card: " + cardID);
+                            
+                            connection.end();
+                            res.locals.description = "activated";
+                            res.locals.success = "1";
+                            res.locals.cardID = cardID;
+                            next();  
                         }
                     });
                     next();
@@ -138,57 +149,49 @@ function createCard(req, res, next)
 
 function logCreate(req, res)
 {
-    let connection = createConnection();
-    connection.connect(function (err)
-    {
-        if (err)
-        {
-            console.log(err.message);
-            connection.end();
+    if(res.locals.clientID != '' && res.locals.clientID !== undefined){
+
+        //get timestamp
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date + ' ' + time;
+        
+        var log = {
+            "logType" : "cardCreated",
+            "cardID" : res.locals.cardID,
+            "cardType" : res.locals.cardType,
+            "clientID" : res.locals.clientID,
+            "description" : res.locals.description,
+            "success" : res.locals.success,
+            "timestamp" : dateTime
         }
-        else
-        {
-            connection.query(`SELECT * FROM CardAuthentication ORDER BY cardID DESC LIMIT 1`, (err, rows) =>
-            {
-                if (err)
-                {
-                    console.log("Card ID not found");
-                }
-                else
-                {
 
-                    //get timestamp
-                    var today = new Date();
-                    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-                    var dateTime = date + ' ' + time;
-
-                    if (fs.existsSync("auth.txt"))
-                    {
-                        // json string for log
-                        var jsonString = `,{\"logType\":\"cardCreated\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"clientID\":\"${rows[0].clientID}\",\"description\":\"activated\",\"timestamp\":\"${dateTime}\"}}`;
-                    }
-                    else
-                    {
-                        // json string for log
-                        var jsonString = `{\"logType\":\"cardCreated\",\"logData\":{\"cardID\":\"${rows[0].cardID}\",\"cardType\":\"${rows[0].cardType}\",\"clientID\":\"${rows[0].clientID}\",\"description\":\"activated\",\"timestamp\":\"${dateTime}\"}}`;
-                    }
-
-
-                    // **************************************************
-                    //              Write JSON to textfile
-                    // -------------------------------------------------
-                    fs.appendFile("auth.txt", jsonString, function (err, data)
-                    {
-                        if (err) console.log(err);
-                        console.log("Successfully Logged Card Creation to Log File.");
-                    });
-                    // **************************************************
-
-                }
-            });
+        if (fs.existsSync("logs.txt")) {
+            // json string for log
+            // var jsonString = `,{\"logType\":\"cardAuthentication\",\"cardID\":\"${res.locals.cardID}\",\"cardType\":\"${res.locals.cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"${res.locals.description}\",\"success\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+            
+            var jsonString = "," + JSON.stringify(log);
+        
+        } else {
+            // json string for log
+            //var jsonString = `{\"logType\":\"cardAuthentication\",\"cardID\":\"${res.locals.cardID}\",\"cardType\":\"${res.locals.cardType}\",\"clientID\":\"${res.locals.clientID}\",\"description\":\"${res.locals.description}\",\"success\":\"${res.locals.authenticated}\",\"timestamp\":\"${dateTime}\"}}`;
+            
+            var jsonString = JSON.stringify(log);
         }
-    });
+        
+
+        // **************************************************
+        //              Write JSON to textfile       
+        // -------------------------------------------------  
+        fs.appendFile("logs.txt", jsonString, function(err, data) {
+            if (err) console.log(err);
+            else {
+                 console.log("Successfully Logged Card Creation to Log File.");
+            }
+        });
+        // **************************************************
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
