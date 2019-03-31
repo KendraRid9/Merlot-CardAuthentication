@@ -35,7 +35,9 @@ function createConnection(){
                 status: "fail", 
                 message: "no clientID was found"
             });
-        } else {  
+        } else {
+            var clientID = req.query.clientID;
+            res.locals.clientID = clientID;
             let connection = createConnection();
             let clientID = req.query.clientID;
             res.locals.clientID = clientID;
