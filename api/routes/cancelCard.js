@@ -39,8 +39,6 @@ function createConnection(){
             var clientID = req.query.clientID;
             res.locals.clientID = clientID;
             let connection = createConnection();
-            let clientID = req.query.clientID;
-            res.locals.clientID = clientID;
             connection.connect(function(err) {
                 if(err) {
                     res.status(200).json({
