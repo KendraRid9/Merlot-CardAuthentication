@@ -189,8 +189,8 @@ function authenticateGetNFC(req, res, next) {
 //Post request for authenticate card
 function authenticatePostNFC(req, res, next) {
     const qs = {
-        cardID: req.query.cardID,
-        pin: req.query.pin
+        cardID: req.body.cardID,
+        pin: req.body.pin
     };
 
     if(qs.cardID != undefined){
