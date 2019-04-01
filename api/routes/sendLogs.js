@@ -40,8 +40,8 @@ var querystring = require('querystring')
 
           var options = { 
                 method: 'POST',
-                url: 'https://safe-journey-59939.herokuapp.com/logData',
-                // host: 'still-oasis-34724.herokuapp.com',
+                // url: 'https://safe-journey-59939.herokuapp.com/logData',
+                url: 'still-oasis-34724.herokuapp.com/uploadLog',
                 // port: '80',
                 port: '3000',
                 // path: 'uploadLog',
@@ -114,8 +114,8 @@ var querystring = require('querystring')
 
           var options = { 
                 method: 'POST',
-                url: 'https://safe-journey-59939.herokuapp.com/logData',
-                // host: 'still-oasis-34724.herokuapp.com',
+                // url: 'https://safe-journey-59939.herokuapp.com/logData',
+                url: 'still-oasis-34724.herokuapp.com/uploadLog',
                 // port: '80',
                 port: '3000',
                 // path: 'uploadLog',
