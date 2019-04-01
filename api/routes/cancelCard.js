@@ -30,13 +30,12 @@ function createConnection(){
 //////////////////////////////////////////////  Cancel Cards  /////////////////////////////////////////////////////
 
     function cancelCard(req, res, next) {
-        if(req.query.clientID === undefined || req.query.clientID == ''){
-            res.status(200).json({
-                status: "fail", 
-                message: "no clientID was found"
+        if(req.body.clientID === undefined || req.body.clientID == ''){
+            res.status(404).json({
+                message: "No clientID was found"
             });
         } else {
-            var clientID = req.query.clientID;
+            var clientID = req.body.clientID;
             res.locals.clientID = clientID;
             let connection = createConnection();
             connection.connect(function(err) {
@@ -89,9 +88,13 @@ function createConnection(){
     
     function logCancel(req, res) {
 
-        if(res.locals.clientID !== undefined && res.locals.clientID !== ''){
-            
-            let connection = createConnection();
+        let connection = createConnection();
+
+        var clientID = req.body.clientID;   // clientID should be set in cancelCard when they
+        
+        if(clientID === undefined || clientID ===''){
+            console.log('Client ID not found')
+        }else {
             connection.connect(function(err) {
                 if(err){
                     res.status(404).json({
