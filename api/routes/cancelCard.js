@@ -31,7 +31,7 @@ function createConnection(){
 //////////////////////////////////////////////  Cancel Cards  /////////////////////////////////////////////////////
 
     function cancelCard(req, res, next) {
-        if(req.query.clientID === undefined || req.query.clientID == ''){
+        if(req.body.clientID === undefined || req.body.clientID == ''){
             res.status(404).json({
                 message: "No clientID was found"
             });
@@ -68,7 +68,7 @@ function createConnection(){
 
         let connection = createConnection();
 
-        var clientID = req.query.clientID;   // clientID should be set in cancelCard when they
+        var clientID = req.body.clientID;   // clientID should be set in cancelCard when they
         
         if(clientID === undefined || clientID ===''){
             console.log('Client ID not found')
