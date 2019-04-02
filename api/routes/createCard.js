@@ -60,7 +60,7 @@ function createCard(req, res, next)
             resMessage = err.message;
             res.status(200).json({
                 status: "fail",
-                message: "no clientID was found"
+                message: resMessage
             });
             connection.end();
         }
@@ -91,14 +91,14 @@ function createCard(req, res, next)
             {
                 if(err)
                 {
-                    res.status(200).json({
-                        status: "fail",
-                        message: "no clientID was found"
-                    });
-
                     resStatus = "fail";
                     resMessage = err.message;
                     console.log(err.message);
+
+                    res.status(200).json({
+                        status: "fail",
+                        message: resMessage
+                    });
 
                     connection.end();
                     res.locals.description = err.message;
@@ -108,27 +108,65 @@ function createCard(req, res, next)
                 }
                 else
                 {
-                    res.status(200).json({
-                        status: resStatus,
-                        message: resMessage
-                    });
-
                     cardID = results.insertId;
                     console.log("inserted card: " + cardID);
-                    
-                    connection.end();
                     res.locals.description = "activated";
                     res.locals.success = "1";
                     res.locals.cardID = cardID;
+            
+                    // **************************************************************************************
+                    //                       Notify Client Notification Subsystem      
+                    // -------------------------------------------------------------------------------------- 
+                    var jsonObject = {
+                        "ClientID": res.locals.clientID,
+                        "Type": "card",
+                        "Content": {
+                            "cardnumber": res.locals.cardID,
+                            "pin": res.locals.pin
+                        }
+                    };
+                    
+                    var stringified = JSON.stringify(jsonObject); //Stringify JSON object before using it in body
+
+                    var options = { //Double check port once their API is up and running, ****NB****
+                        method: 'POST',
+                        url: 'http://merlotnotification.herokuapp.com/',
+                        headers: { 
+                            'Postman-Token': 'fe00621e-2cbe-4120-83c5-1b340d0b541e',
+                            'cache-control': 'no-cache',
+                            'Content-Type': 'application/json' 
+                        },
+                        body: stringified
+                    };
+
+                    request(options, (err, response, body) => { //Logging on our side whether we successfully sent it to them or not
+                        if(err) {
+                            res.status(200).json({
+                                status: resStatus,
+                                message: resMessage,
+                                notifyClient: false
+                            });
+                            console.log(err.message);
+                        } else {
+                            var obj = JSON.parse(body);
+                            res.status(200).json({
+                                status: resStatus,
+                                message: resMessage,
+                                notifyClient: obj.status
+                            });
+                            console.log(body)
+                        }
+                    })
+                    // **************************************************************************************
+
+                    connection.end();
                     next();  
                 }
             });   
         }
     });
 }
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////  Log Create Card  //////////////////////////////////////////////////
 
