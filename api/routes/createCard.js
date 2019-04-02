@@ -36,7 +36,7 @@ router.post('/', createCard, logCreate);
 
 function createCard(req, res, next)
 {
-    var clientID = req.query.clientID;
+    var clientID = req.body.clientID;
     let connection = createConnection();
     let resStatus = "success";
     let resMessage = "card created";
