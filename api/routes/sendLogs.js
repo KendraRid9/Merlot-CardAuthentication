@@ -20,7 +20,7 @@ var querystring = require('querystring')
        
         if(err) {
           console.log(err.message);
-          res.status(200).json({
+          res.status(404).json({
             status: "fail",
             message: "no logs to send"
           });
@@ -28,29 +28,21 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ]}`;
-              
-          var jsonObj = JSON.parse(jsonString);
+          var jsonString = `{"logs":[ ${contents} ],"system":"auth"}`;
 
-          // console.log("querystring:" + querystring.stringify(jsonObj));
-          // console.log("stringify:" + JSON.stringify(jsonObj));
-
-          // var logObj = querystring.stringify(jsonObj);
-          var logObj = JSON.stringify(jsonObj);
+          var postData = querystring.stringify({
+             "log_set" : jsonString
+          });
 
           var options = { 
                 method: 'POST',
-                // url: 'https://safe-journey-59939.herokuapp.com/logData',
-                url: 'still-oasis-34724.herokuapp.com/uploadLog',
-                // port: '80',
-                port: '3000',
-                // path: 'uploadLog',
+                url: 'https://still-oasis-34724.herokuapp.com/uploadLog',
                 headers: 
                 { 
                   'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(logObj)
+                  'Content-Length': Buffer.byteLength(postData)
                 },
-                qs: {"logFile": logObj} 
+                body: postData 
             };
 
           //send log to reporting  
@@ -75,8 +67,6 @@ var querystring = require('querystring')
                   });
                 }
               });
-
-              // send response back to /sendLogs request to notify them that logs were successfully sent
             }
           });
       }
@@ -102,29 +92,21 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ]}`;
-              
-          var jsonObj = JSON.parse(jsonString);
+          var jsonString = `{"logs":[ ${contents} ],"system":"auth"}`;
 
-          // console.log("querystring:" + querystring.stringify(jsonObj));
-          // console.log("stringify:" + JSON.stringify(jsonObj));
-
-          // var logObj = querystring.stringify(jsonObj);
-          var logObj = JSON.stringify(jsonObj);
+          var postData = querystring.stringify({
+             "log_set" : jsonString
+          });
 
           var options = { 
                 method: 'POST',
-                // url: 'https://safe-journey-59939.herokuapp.com/logData',
-                url: 'still-oasis-34724.herokuapp.com/uploadLog',
-                // port: '80',
-                port: '3000',
-                // path: 'uploadLog',
+                url: 'https://still-oasis-34724.herokuapp.com/uploadLog',
                 headers: 
                 { 
                   'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(logObj)
+                  'Content-Length': Buffer.byteLength(postData)
                 },
-                qs: {"logFile": logObj} 
+                body: postData 
             };
 
           //send log to reporting  
@@ -149,8 +131,6 @@ var querystring = require('querystring')
                   });
                 }
               });
-
-              // send response back to /sendLogs request to notify them that logs were successfully sent
             }
           });
       }
