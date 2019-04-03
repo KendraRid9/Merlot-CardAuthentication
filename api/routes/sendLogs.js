@@ -48,25 +48,38 @@ var querystring = require('querystring')
           //send log to reporting  
           request(options, (err, response, body) => {
             if(err) {
+              res.status(404).json({
+                status: "fail",
+                message: "could not send logs",
+                error: err.message
+              });
               console.log(err.message);
             }
             else {
-              console.log(response.statusCode);
-              fs.unlink("logs.txt", (err) => {
-                if(err){
-                  console.log(err.message);
-                  res.status(200).json({
-                    status: "fail",
-                    message: "did not send Logs"
-                  });
-                } else {
-                  console.log("Log File Deleted");
-                  res.status(200).json({
-                    status: "success",
-                    message: "sent Logs"
-                  });
-                }
-              });
+              if(response.statusCode == 200) {
+
+                res.status(200).json({
+                  status: "success",
+                  message: "logs sent",
+                  response: body,
+                  data: JSON.parse(jsonString)
+                });
+
+                fs.unlink("logs.txt", (err) => {
+                  if(err){
+                    console.log("Log file could not be reset");  
+                  } else {
+                    console.log("Log file reset");
+                  }
+                });
+              } else {
+                res.status(404).json({
+                  status: "fail",
+                  message: "logs sent",
+                  response: body,
+                  data: JSON.parse(jsonString)
+                });
+              }
             }
           });
       }
@@ -79,7 +92,7 @@ var querystring = require('querystring')
 
     router.post('/', (req, res) => {
 
-       // read log objects from file
+      // read log objects from file
       fs.readFile('logs.txt', (err, contents) => {
        
         if(err) {
@@ -112,25 +125,38 @@ var querystring = require('querystring')
           //send log to reporting  
           request(options, (err, response, body) => {
             if(err) {
+              res.status(404).json({
+                status: "fail",
+                message: "could not send logs",
+                error: err.message
+              });
               console.log(err.message);
             }
             else {
-              console.log(response.statusCode);
-              fs.unlink("logs.txt", (err) => {
-                if(err){
-                  console.log(err.message);
-                  res.status(200).json({
-                    status: "fail",
-                    message: "did not send Logs"
-                  });
-                } else {
-                  console.log("Log File Deleted");
-                  res.status(200).json({
-                    status: "success",
-                    message: "sent Logs"
-                  });
-                }
-              });
+              if(response.statusCode == 200) {
+
+                res.status(200).json({
+                  status: "success",
+                  message: "logs sent",
+                  response: body,
+                  data: JSON.parse(jsonString)
+                });
+
+                fs.unlink("logs.txt", (err) => {
+                  if(err){
+                    console.log("Log file could not be reset");  
+                  } else {
+                    console.log("Log file reset");
+                  }
+                });
+              } else {
+                res.status(404).json({
+                  status: "fail",
+                  message: "logs sent",
+                  response: body,
+                  data: JSON.parse(jsonString)
+                });
+              }
             }
           });
       }
