@@ -40,7 +40,7 @@ function createConnection(){
             let connection = createConnection();
             connection.connect(function(err) {
                 if(err) {
-                    res.status(200).json({
+                    res.status(500).json({
                         status: "fail", 
                         message: "database connection issue on NFC module",
                     });
@@ -50,7 +50,7 @@ function createConnection(){
                     let query = 'Select * from CardAuthentication where clientID =' + clientID;
                     connection.query(query, function(err, rows){
                         if(rows.length == 0){
-                            res.status(200).json({
+                            res.status(404).json({
                                 status: "fail", 
                                 message: "client not found in database",
                             });
@@ -60,7 +60,7 @@ function createConnection(){
                             {
                                 if (err) {
                                     console.log(err.message);
-                                    res.status(200).json({
+                                    res.status(500).json({
                                         status: "fail", 
                                         message: "database connection issue on NFC module",
                                     });
@@ -106,6 +106,10 @@ function createConnection(){
 
                     connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${res.locals.clientID}`, (err, rows) => {
                         if(err){
+                            res.status(404).json({
+                                message: "client not found"
+                            });
+
                            console.log("client not found");
                            connection.end();
                         }
@@ -179,6 +183,10 @@ function createConnection(){
                                 }  
         
                             } else {
+                                res.status(404).json({
+                                    message: "client not found"
+                                });
+
                                 console.log("client not found");
                             }
                         }
