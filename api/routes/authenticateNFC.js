@@ -49,7 +49,7 @@ function authenticateGetNFC(req, res, next) {
     }
     
     if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
-        res.status(400).json({
+        res.status(200).json({
             Success: "false",
             ClientID: "",
             Message: "Expected cardID",
@@ -61,7 +61,7 @@ function authenticateGetNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(500).json({
+                res.status(200).json({
                     Success: "false",
                     ClientID: "",
                     Message: "Database connection issue on NFC module"   
@@ -71,7 +71,7 @@ function authenticateGetNFC(req, res, next) {
 
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "cardID not found"
@@ -84,7 +84,7 @@ function authenticateGetNFC(req, res, next) {
                         next();
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",   
                             Message: "card deactivated"    
@@ -109,7 +109,7 @@ function authenticateGetNFC(req, res, next) {
                         res.locals.clientID = rows[0].clientID;
                         next();
                     } else {
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "cardID not found"
@@ -130,7 +130,7 @@ function authenticateGetNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(500).json({
+                res.status(200).json({
                     Success: "false",
                     ClientID: "",
                     Message: "Database connection issue on NFC module",
@@ -140,7 +140,7 @@ function authenticateGetNFC(req, res, next) {
 
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "cardID not found"
@@ -153,7 +153,7 @@ function authenticateGetNFC(req, res, next) {
                         next();
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "card deactivated"
@@ -170,7 +170,7 @@ function authenticateGetNFC(req, res, next) {
                         let pinMatch = bcrypt.compareSync(qs.pin, hash);
 
                         if(pinMatch == false) {
-                            res.status(404).json({
+                            res.status(200).json({
                                 Success: "false",
                                 ClientID: rows[0].clientID,
                                 Message: "pin invalid"
@@ -201,7 +201,7 @@ function authenticateGetNFC(req, res, next) {
     }
     //Any other error that may occur
     else {
-        res.status(500).json({
+        res.status(200).json({
             Success: "false",
             ClientID: "",
             Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
@@ -231,7 +231,7 @@ function authenticatePostNFC(req, res, next) {
     }
     
     if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
-        res.status(400).json({
+        res.status(200).json({
             Success: "false",
             ClientID: "",
             Message: "Expected cardID",
@@ -243,7 +243,7 @@ function authenticatePostNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(500).json({
+                res.status(200).json({
                     Success: "false",
                     ClientID: "",
                     Message: "Database connection issue on NFC module"   
@@ -253,7 +253,7 @@ function authenticatePostNFC(req, res, next) {
 
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "cardID not found"
@@ -266,7 +266,7 @@ function authenticatePostNFC(req, res, next) {
                         next();
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",   
                             Message: "card deactivated"    
@@ -291,7 +291,7 @@ function authenticatePostNFC(req, res, next) {
                         res.locals.clientID = rows[0].clientID;
                         next();
                     } else {
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "cardID not found"
@@ -312,7 +312,7 @@ function authenticatePostNFC(req, res, next) {
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
-                res.status(500).json({
+                res.status(200).json({
                     Success: "false",
                     ClientID: "",
                     Message: "Database connection issue on NFC module",
@@ -322,7 +322,7 @@ function authenticatePostNFC(req, res, next) {
 
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "cardID not found"
@@ -335,7 +335,7 @@ function authenticatePostNFC(req, res, next) {
                         next();
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
-                        res.status(404).json({
+                        res.status(200).json({
                             Success: "false",
                             ClientID: "",
                             Message: "card deactivated"
@@ -352,7 +352,7 @@ function authenticatePostNFC(req, res, next) {
                         let pinMatch = bcrypt.compareSync(qs.pin, hash);
 
                         if(pinMatch == false) {
-                            res.status(404).json({
+                            res.status(200).json({
                                 Success: "false",
                                 ClientID: rows[0].clientID,
                                 Message: "pin invalid"
@@ -383,7 +383,7 @@ function authenticatePostNFC(req, res, next) {
     }
     //Any other error that may occur
     else {
-        res.status(500).json({
+        res.status(200).json({
             Success: false,
             ClientID: "",
             Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
