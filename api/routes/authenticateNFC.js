@@ -35,7 +35,6 @@ function authenticateGetNFC(req, res, next) {
         cardID: req.body.cardID,
         pin: req.body.pin
     };
-    console.log("here");
     if(qs.cardID != undefined){
         res.locals.cardID = qs.cardID;
     } else {
@@ -124,7 +123,6 @@ function authenticateGetNFC(req, res, next) {
     }
     //Both cardID and pin are passed through
     else if(qs.cardID !== undefined && qs.pin !==undefined){
-        console.log("here1");
         let connection = createConnection();
         connection.connect(function(err){
             if(err){
@@ -135,7 +133,6 @@ function authenticateGetNFC(req, res, next) {
                 });
                 connection.end();
             }else{
-                console.log("here2")
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     connection.end();
                     console.log(rows);
@@ -187,7 +184,6 @@ function authenticateGetNFC(req, res, next) {
                                 ClientID: rows[0].clientID,
                                 Message: "pin invalid"
                             });
-                            connection.end();
                             res.locals.description = "PIN invalid";
                             res.locals.authenticated = "0";
                             res.locals.cardType = rows[0].cardType;
