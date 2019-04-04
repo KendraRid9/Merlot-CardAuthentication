@@ -75,7 +75,7 @@ var querystring = require('querystring')
               } else {
                 res.status(404).json({
                   status: "fail",
-                  message: "logs sent",
+                  message: "could not send logs",
                   response: body,
                   data: JSON.parse(jsonString)
                 });

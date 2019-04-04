@@ -44,7 +44,7 @@ function createCard(req, res, next)
     if(clientID === undefined || clientID === "")
     {
         console.log("No ClientID Received");
-        res.status(200).json({
+        res.status(400).json({
             status: "fail",
             message: "no clientID received"
         });
@@ -58,7 +58,7 @@ function createCard(req, res, next)
             console.log(err.message);
             resStatus = "fail";
             resMessage = err.message;
-            res.status(200).json({
+            res.status(500).json({
                 status: "fail",
                 message: resMessage
             });
@@ -95,7 +95,7 @@ function createCard(req, res, next)
                     resMessage = err.message;
                     console.log(err.message);
 
-                    res.status(200).json({
+                    res.status(404).json({
                         status: "fail",
                         message: resMessage
                     });
@@ -111,6 +111,7 @@ function createCard(req, res, next)
                     cardID = results.insertId;
                     console.log("inserted card: " + cardID);
                     res.locals.description = "activated";
+                    res.status(200);
                     res.locals.success = "1";
                     res.locals.cardID = cardID;
             
