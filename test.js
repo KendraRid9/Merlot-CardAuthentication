@@ -205,9 +205,78 @@ describe('/createCard', () => {
 });
 
 describe('/cancelCard', () => {
-    
+    const path ='/cancelCard';
+
+    describe('Database connection error', () => {
+        it('Failed connection', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(500); //sent by DBMS, not sure
+                });
+        });
+    });
+
+    describe('Request with no parameter', () => {
+        it('Empty request', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(400);
+                });
+        });
+
+    });
+
+    describe('Request with parameter', () => {
+        it('Valid clientID', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(200); //card cancelled
+                });
+        });
+
+        it('Invalid clientID', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(404); //no clientID was found
+                });
+        });
+    });
 });
 
-describe('sendLogs', () => {
+describe('/sendLogs', () => {
+    const path = '/sendLogs';
 
+    describe('Send logs to Reporting Subsystem', () => {
+        it('Successfully sent', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(200); //successfully sent
+                });
+        });
+
+        it('Not successfully sent', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(400); //not successfully sent
+                });
+        });
+    });
 });

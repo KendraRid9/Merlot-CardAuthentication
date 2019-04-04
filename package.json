@@ -4,7 +4,7 @@
   "description": "Restful API for Merlot NFC data retrieval",
   "main": "server.js",
   "scripts": {
-    "test": "mocha test.js || true",
+    "test": "mocha test.js",
     "start": "node server.js"
   },
   "author": "Graeme Coetzee",
