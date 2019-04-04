@@ -80,7 +80,7 @@ function createCard(req, res, next)
             console.log("Salt: " + salt);*/
 
             res.locals.pin = pin;
-            console.log("PIN: " + pin);
+            // console.log("PIN: " + pin);
             res.locals.clientID = clientID;    
             res.locals.cardType = cardType;
 
@@ -126,12 +126,22 @@ function createCard(req, res, next)
                             "pin": res.locals.pin
                         }
                     };
-                    
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+                    var jsonString1 = JSON.stringify(jsonObject);
+
+                    fs.appendFile("test.txt", jsonString1 + "\n", function(err, data) {
+                        if (err) console.log(err);
+                        else {
+                             console.log("New card");
+                        }
+                    });
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
                     // var stringified = JSON.stringify(jsonObject); //Stringify JSON object before using it in body
 
                     var options = { //Double check port once their API is up and running, ****NB****
                         method: 'POST',
-                        url: 'https://ec2-35-174-115-93.compute-1.amazonaws.com',
+                        url: 'https://ec2-35-174-115-93.compute-1.amazonaws.com/',
                         port: 5000,
                         headers: { 
                             'Postman-Token': 'fe00621e-2cbe-4120-83c5-1b340d0b541e',

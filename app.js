@@ -9,6 +9,7 @@ const cancelCardRoute = require('./api/routes/cancelCard');
 const createCardRoute = require('./api/routes/createCard');
 const sendLogsRoute = require('./api/routes/sendLogs');
 const displayHTML = require('./api/routes/displayHTML');
+const testRoute = require('./api/routes/test');
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -23,6 +24,8 @@ app.use('/createCard', createCardRoute);
 app.use('/cancelCard', cancelCardRoute);
 app.use('/sendLogs', sendLogsRoute);
 app.use('/',displayHTML)
+app.use('/test',testRoute)
+
 
 //Error handling when url doesn't exist
 app.use((req, res, next) => {
