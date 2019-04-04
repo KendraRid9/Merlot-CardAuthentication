@@ -20,7 +20,7 @@ var querystring = require('querystring')
        
         if(err) {
           console.log(err.message);
-          res.status(404).json({
+          res.status(200).json({
             status: "fail",
             message: "no logs to send"
           });
@@ -28,27 +28,29 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ],"system":"auth"}`;
+          var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
 
-          var postData = querystring.stringify({
-             "log_set" : jsonString
-          });
+          var postData = {
+            "log_set": JSON.parse(jsonString)
+          }
 
           var options = { 
                 method: 'POST',
                 url: 'https://still-oasis-34724.herokuapp.com/uploadLog',
                 headers: 
                 { 
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(postData)
+                  'Postman-Token': '5d1436e7-228e-421b-bb71-5083dabb6b22',
+                  'cache-control': 'no-cache',
+                  'Content-Type': 'application/json'
                 },
-                body: postData 
+                body: postData,
+                json: true
             };
 
           //send log to reporting  
           request(options, (err, response, body) => {
             if(err) {
-              res.status(404).json({
+              res.status(200).json({
                 status: "fail",
                 message: "could not send logs",
                 error: err.message
@@ -62,7 +64,7 @@ var querystring = require('querystring')
                   status: "success",
                   message: "logs sent",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
 
                 fs.unlink("logs.txt", (err) => {
@@ -73,11 +75,11 @@ var querystring = require('querystring')
                   }
                 });
               } else {
-                res.status(404).json({
+                res.status(200).json({
                   status: "fail",
                   message: "could not send logs",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
               }
             }
@@ -97,7 +99,7 @@ var querystring = require('querystring')
        
         if(err) {
           console.log(err.message);
-          res.status(404).json({
+          res.status(200).json({
             status: "fail",
             message: "no logs to send"
           });
@@ -105,27 +107,29 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ],"system":"auth"}`;
+          var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
 
-          var postData = querystring.stringify({
-             "log_set" : jsonString
-          });
+          var postData = {
+            "log_set": JSON.parse(jsonString)
+          }
 
           var options = { 
                 method: 'POST',
                 url: 'https://still-oasis-34724.herokuapp.com/uploadLog',
                 headers: 
                 { 
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(postData)
+                  'Postman-Token': '5d1436e7-228e-421b-bb71-5083dabb6b22',
+                  'cache-control': 'no-cache',
+                  'Content-Type': 'application/json'
                 },
-                body: postData 
+                body: postData,
+                json: true
             };
 
           //send log to reporting  
           request(options, (err, response, body) => {
             if(err) {
-              res.status(404).json({
+              res.status(200).json({
                 status: "fail",
                 message: "could not send logs",
                 error: err.message
@@ -139,7 +143,7 @@ var querystring = require('querystring')
                   status: "success",
                   message: "logs sent",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
 
                 fs.unlink("logs.txt", (err) => {
@@ -150,11 +154,11 @@ var querystring = require('querystring')
                   }
                 });
               } else {
-                res.status(404).json({
+                res.status(200).json({
                   status: "fail",
-                  message: "logs sent",
+                  message: "could not send logs",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
               }
             }

@@ -80,6 +80,7 @@ function createCard(req, res, next)
             console.log("Salt: " + salt);*/
 
             res.locals.pin = pin;
+            // console.log("PIN: " + pin);
             res.locals.clientID = clientID;    
             res.locals.cardType = cardType;
 
@@ -89,6 +90,7 @@ function createCard(req, res, next)
             cardID = -1;
             connection.query(sql,values,(err,results,fields) =>
             {
+                connection.end();
                 if(err)
                 {
                     resStatus = "fail";
@@ -100,7 +102,6 @@ function createCard(req, res, next)
                         message: resMessage
                     });
 
-                    connection.end();
                     res.locals.description = err.message;
                     res.locals.success = "0";
                     res.locals.cardID = "-1";
@@ -111,7 +112,6 @@ function createCard(req, res, next)
                     cardID = results.insertId;
                     console.log("inserted card: " + cardID);
                     res.locals.description = "activated";
-                    res.status(200);
                     res.locals.success = "1";
                     res.locals.cardID = cardID;
             
@@ -126,18 +126,29 @@ function createCard(req, res, next)
                             "pin": res.locals.pin
                         }
                     };
-                    
-                    var stringified = JSON.stringify(jsonObject); //Stringify JSON object before using it in body
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+                    var jsonString1 = JSON.stringify(jsonObject);
+
+                    fs.appendFile("test.txt", jsonString1 + "\n", function(err, data) {
+                        if (err) console.log(err);
+                        else {
+                             console.log("New card");
+                        }
+                    });
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+                    // var stringified = JSON.stringify(jsonObject); //Stringify JSON object before using it in body
 
                     var options = { //Double check port once their API is up and running, ****NB****
                         method: 'POST',
-                        url: 'http://merlotnotification.herokuapp.com/',
+                        url: 'http://ec2-35-174-115-93.compute-1.amazonaws.com:5000',
                         headers: { 
                             'Postman-Token': 'fe00621e-2cbe-4120-83c5-1b340d0b541e',
                             'cache-control': 'no-cache',
                             'Content-Type': 'application/json' 
                         },
-                        body: stringified
+                        body: jsonObject,
+                        json: true
                     };
 
                     request(options, (err, response, body) => { //Logging on our side whether we successfully sent it to them or not
@@ -149,23 +160,24 @@ function createCard(req, res, next)
                             });
                             console.log(err.message);
                         } else {
-                            var obj = JSON.parse(body);
                             res.status(200).json({
                                 status: resStatus,
                                 message: resMessage,
-                                notifyClient: obj.status
+                                notifyClient: body.status
                             });
-                            console.log(body)
+                            console.log(body.message)
                         }
                     })
                     // **************************************************************************************
-
-                    connection.end();
                     next();  
                 }
             });   
         }
     });
+
+    // if(connection.state === 'disconnected'){
+    //     connection.end();
+    // }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -214,6 +226,8 @@ function logCreate(req, res)
                  console.log("Successfully Logged Card Creation to Log File.");
             }
         });
+
+        console.log(res.locals.cardID);
         // **************************************************
     }
 }

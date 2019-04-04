@@ -17,6 +17,7 @@
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Request Route</th>
+                        <th scope="col">HTTP Method</th>
                         <th scope="col">Required Parameters</th>
                         <th scope="col">Valid Example</th>
                         <th scope="col">Response</th>
@@ -25,7 +26,8 @@
                 <tbody>
                     <tr>
                         <th scope="row">1</th>
-                        <td>AuthenticateNFC</td>
+                        <td>authenticateNFC</td>
+                        <td>POST</td>
                         <td>cardID, pin</td>
                         <td>https://merlot-card-authentication.herokuapp.com/authenticateNFC?cardID=44&pin=4553
                             <br>
@@ -47,6 +49,7 @@
                     <tr>
                         <th scope="row">2</th>
                         <td>createCard</td>
+                        <td>POST</td>
                         <td>clientID</td>
                         <td>https://merlot-card-authentication.herokuapp.com/cancelCard?clientID=2</td>
                         <td>
@@ -62,6 +65,7 @@
                     <tr>
                         <th scope="row">3</th>
                         <td>cancelCard</td>
+                        <td>POST</td>
                         <td>clientID</td>
                         <td>https://merlot-card-authentication.herokuapp.com/createCard?clientID=2</td>
                         <td>
@@ -77,6 +81,7 @@
                     <tr>
                         <th scope="row">4</th>
                         <td>sendLogs</td>
+                        <td>POST</td>
                         <td>None</td>
                         <td>https://merlot-card-authentication.herokuapp.com/sendLogs</td>
                         <td>
