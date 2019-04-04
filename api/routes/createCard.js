@@ -141,8 +141,7 @@ function createCard(req, res, next)
 
                     var options = { //Double check port once their API is up and running, ****NB****
                         method: 'POST',
-                        url: 'https://ec2-35-174-115-93.compute-1.amazonaws.com/',
-                        port: 5000,
+                        url: 'http://ec2-35-174-115-93.compute-1.amazonaws.com:5000',
                         headers: { 
                             'Postman-Token': 'fe00621e-2cbe-4120-83c5-1b340d0b541e',
                             'cache-control': 'no-cache',
@@ -161,13 +160,12 @@ function createCard(req, res, next)
                             });
                             console.log(err.message);
                         } else {
-                            var obj = JSON.parse(body);
                             res.status(200).json({
                                 status: resStatus,
                                 message: resMessage,
-                                notifyClient: obj.status
+                                notifyClient: body.status
                             });
-                            console.log(body)
+                            console.log(body.message)
                         }
                     })
                     // **************************************************************************************
