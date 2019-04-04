@@ -28,7 +28,7 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
+          var jsonString = `{"logs":[ ${contents} ],"system":"auth"}`;
 
           var postData = {
             "log_set": JSON.parse(jsonString)
@@ -107,7 +107,7 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
+          var jsonString = `{"logs":[ ${contents} ],"system":"auth"}`;
 
           var postData = {
             "log_set": JSON.parse(jsonString)
