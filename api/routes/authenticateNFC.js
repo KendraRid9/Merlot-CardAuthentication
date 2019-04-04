@@ -50,9 +50,9 @@ function authenticateGetNFC(req, res, next) {
     
     if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
         res.status(200).json({
-            success: "false",
-            clientID: "none",
-            message: "Expected cardID",
+            Success: "false",
+            ClientID: "",
+            Message: "Expected cardID",
         });
     }
 
@@ -62,9 +62,9 @@ function authenticateGetNFC(req, res, next) {
         connection.connect(function(err){
             if(err){
                 res.status(200).json({
-                    success: "false",
-                    clientID: "none",
-                    message: "Database connection issue on NFC module"   
+                    Success: "false",
+                    ClientID: "",
+                    Message: "Database connection issue on NFC module"   
                 });
                 connection.end();
             }else{
@@ -72,9 +72,9 @@ function authenticateGetNFC(req, res, next) {
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "cardID not found"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "cardID not found"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -85,9 +85,9 @@ function authenticateGetNFC(req, res, next) {
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",   
-                            message: "card deactivated"    
+                            Success: "false",
+                            ClientID: "",   
+                            Message: "card deactivated"    
                         });
                         connection.end();
                         res.locals.description = "card de-activated";
@@ -98,9 +98,9 @@ function authenticateGetNFC(req, res, next) {
                     }
                     else if(rows.length > 0 && rows[0].active == 1){
                         res.status(200).json({
-                            success: "true",
-                            clientID: rows[0].clientID,
-                            message: "client found"
+                            Success: "true",
+                            ClientID: rows[0].clientID,
+                            Message: "authenticated"
                         });
                         connection.end();
                         res.locals.description = "authenticated";
@@ -110,9 +110,9 @@ function authenticateGetNFC(req, res, next) {
                         next();
                     } else {
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "cardID not found"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "cardID not found"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -131,9 +131,9 @@ function authenticateGetNFC(req, res, next) {
         connection.connect(function(err){
             if(err){
                 res.status(200).json({
-                    success: "false",
-                    clientID: "none",
-                    message: "Database connection issue on NFC module",
+                    Success: "false",
+                    ClientID: "",
+                    Message: "Database connection issue on NFC module",
                 });
                 connection.end();
             }else{
@@ -141,9 +141,9 @@ function authenticateGetNFC(req, res, next) {
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "cardID not found"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "cardID not found"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -154,9 +154,9 @@ function authenticateGetNFC(req, res, next) {
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "card deactivated"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "card deactivated"
                         });
                         connection.end();
                         res.locals.description = "card de-activated";
@@ -171,9 +171,9 @@ function authenticateGetNFC(req, res, next) {
 
                         if(pinMatch == false) {
                             res.status(200).json({
-                                success: "false",
-                                clientID: rows[0].clientID,
-                                message: "pin invalid"
+                                Success: "false",
+                                ClientID: rows[0].clientID,
+                                Message: "pin invalid"
                             });
                             connection.end();
                             res.locals.description = "PIN invalid";
@@ -183,9 +183,9 @@ function authenticateGetNFC(req, res, next) {
                             next();
                         } else {
                             res.status(200).json({
-                                success: "true",
-                                clientID: rows[0].clientID,
-                                message: "cardID found, pin matching"
+                                Success: "true",
+                                ClientID: rows[0].clientID,
+                                Message: "authenticated"
                             });
                             connection.end();
                             res.locals.description = "authenticated";
@@ -202,9 +202,9 @@ function authenticateGetNFC(req, res, next) {
     //Any other error that may occur
     else {
         res.status(200).json({
-            success: false,
-            clientID: "none",
-            message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
+            Success: "false",
+            ClientID: "",
+            Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
         connection.end();
     } 
@@ -232,9 +232,9 @@ function authenticatePostNFC(req, res, next) {
     
     if((qs.cardID === undefined || qs.cardID == '') && (qs.pin === undefined ||qs.pin == '')){
         res.status(200).json({
-            success: "false",
-            clientID: "none",
-            message: "Expected cardID",
+            Success: "false",
+            ClientID: "",
+            Message: "Expected cardID",
         });
     }
 
@@ -244,9 +244,9 @@ function authenticatePostNFC(req, res, next) {
         connection.connect(function(err){
             if(err){
                 res.status(200).json({
-                    success: "false",
-                    clientID: "none",
-                    message: "Database connection issue on NFC module"   
+                    Success: "false",
+                    ClientID: "",
+                    Message: "Database connection issue on NFC module"   
                 });
                 connection.end();
             }else{
@@ -254,9 +254,9 @@ function authenticatePostNFC(req, res, next) {
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "cardID not found"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "cardID not found"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -267,9 +267,9 @@ function authenticatePostNFC(req, res, next) {
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",   
-                            message: "card deactivated"    
+                            Success: "false",
+                            ClientID: "",   
+                            Message: "card deactivated"    
                         });
                         connection.end();
                         res.locals.description = "card de-activated";
@@ -280,9 +280,9 @@ function authenticatePostNFC(req, res, next) {
                     }
                     else if(rows.length > 0 && rows[0].active == 1){
                         res.status(200).json({
-                            success: "true",
-                            clientID: rows[0].clientID,
-                            message: "client found"
+                            Success: "true",
+                            ClientID: rows[0].clientID,
+                            Message: "authenticated"
                         });
                         connection.end();
                         res.locals.description = "authenticated";
@@ -292,9 +292,9 @@ function authenticatePostNFC(req, res, next) {
                         next();
                     } else {
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "cardID not found"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "cardID not found"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -313,9 +313,9 @@ function authenticatePostNFC(req, res, next) {
         connection.connect(function(err){
             if(err){
                 res.status(200).json({
-                    success: "false",
-                    clientID: "none",
-                    message: "Database connection issue on NFC module",
+                    Success: "false",
+                    ClientID: "",
+                    Message: "Database connection issue on NFC module",
                 });
                 connection.end();
             }else{
@@ -323,9 +323,9 @@ function authenticatePostNFC(req, res, next) {
                 connection.query("SELECT * FROM CardAuthentication WHERE cardID='" + qs.cardID + "'", function(err, rows) {
                     if(err){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "cardID not found"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "cardID not found"
                         });
                         connection.end();
                         res.locals.description = "cardID not found";
@@ -336,9 +336,9 @@ function authenticatePostNFC(req, res, next) {
                     }
                     else if(rows.length > 0 && rows[0].active == 0){
                         res.status(200).json({
-                            success: "false",
-                            clientID: "none",
-                            message: "card deactivated"
+                            Success: "false",
+                            ClientID: "",
+                            Message: "card deactivated"
                         });
                         connection.end();
                         res.locals.description = "card de-activated";
@@ -353,9 +353,9 @@ function authenticatePostNFC(req, res, next) {
 
                         if(pinMatch == false) {
                             res.status(200).json({
-                                success: "false",
-                                clientID: rows[0].clientID,
-                                message: "pin invalid"
+                                Success: "false",
+                                ClientID: rows[0].clientID,
+                                Message: "pin invalid"
                             });
                             connection.end();
                             res.locals.description = "PIN invalid";
@@ -365,9 +365,9 @@ function authenticatePostNFC(req, res, next) {
                             next();
                         } else {
                             res.status(200).json({
-                                success: "true",
-                                clientID: rows[0].clientID,
-                                message: "cardID found, pin matching"
+                                Success: "true",
+                                ClientID: rows[0].clientID,
+                                Message: "authenticated"
                             });
                             connection.end();
                             res.locals.description = "authenticated";
@@ -384,9 +384,9 @@ function authenticatePostNFC(req, res, next) {
     //Any other error that may occur
     else {
         res.status(200).json({
-            success: false,
-            clientID: "none",
-            message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
+            Success: false,
+            ClientID: "",
+            Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
         connection.end();
     } 

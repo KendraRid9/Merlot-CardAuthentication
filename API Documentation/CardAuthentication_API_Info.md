@@ -1,11 +1,10 @@
 # Merlot Card Authentication API
 
 Card Authentication will provide services for:
-* Authenticating a Card
-* Creating a Card
-* Cancelling a Card
-* Resetting a Card's PIN
-* Logging
+* Authenticating a card
+* Creating a card for a client
+* Cancelling/De-activating all cards linked to a client
+* Logging of all services
 ---
 
 ##### Heroku:
@@ -42,19 +41,32 @@ var options = {
 ```
 ###### Response:
 ```javascript
+Authenticated:
 {
-    status : "Authenticated",
-    clientID : clientID
+    success : true,
+    clientID : clientID,
+    message: "Authenticated"
 }
-OR
+                OR
+
+cardID not found OR card de-activated:
 {
-    status : "NotAuthenticated",
-    clientID :"None"
+    success : false,
+    clientID : "",
+    message: "NotAuthenticated"
+}
+                OR
+                
+cardID found but PIN invalid:
+{
+    success : false,
+    clientID : clientID,
+    message: "NotAuthenticated"
 }
 ```
 ---
 
-#### Client Accounts System
+#### Client Information System
 ###### Request 
 ```javascript
 var data = {
@@ -77,7 +89,7 @@ var options = {
 ```javascript
 {
     status : "success",
-    message : "card created OR card cancelled"
+    message : "card created OR cards cancelled",
 }
 OR
 {
@@ -101,7 +113,7 @@ var data = {
 
 var options = { 
     method : "POST",
-    url : "http://127.0.0.1:5555",
+    url : "http://merlotnotification.herokuapp.com/",
     headers: {
         "Postman-Token" : "fe00621e-2cbe-4120-83c5-1b340d0b541e",
         "cache-control" : "no-cache",
@@ -130,15 +142,22 @@ OR
 #### Reporting System
 ###### Request 
 ```javascript
-var data = {
-  logFile : "auth.txt"
+var postData = querystring.stringify({
+	log_set: logData
+})
+
+var options = {
+	host : "https://still-oasis-34724.herokuapp.com",
+	port : 80,
+	path : "/uploadLog",
+	method : "POST",
+	headers : {
+	 "Content-Type" : "application/x-www-form-urlencoded",
+	 "Content-Length" : Buffer.byteLength(<postData>)
 }
-
-var options = { 
-
-};
 ```
 ###### Their Response:
 ```javascript
+text
 ```
 ---

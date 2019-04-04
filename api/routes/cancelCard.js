@@ -31,7 +31,7 @@ function createConnection(){
 
     function cancelCard(req, res, next) {
         if(req.body.clientID === undefined || req.body.clientID == ''){
-            res.status(404).json({
+            res.status(200).json({
                 message: "No clientID was found"
             });
         } else {
@@ -69,7 +69,7 @@ function createConnection(){
                                     console.log(result.affectedRows + " record(s) updated");
                                     res.status(200).json({
                                         status: "success", 
-                                        message: "card cancelled"
+                                        message: "cards cancelled"
                                     });
                                     connection.end();
                                 }   
@@ -97,10 +97,7 @@ function createConnection(){
         }else {
             connection.connect(function(err) {
                 if(err){
-                    res.status(404).json({
-                        message: "could not log card cancellation. Database connection issue on NFC module",
-                        error: err.message
-                    });
+                    console.log("could not log card cancellation. Database connection issue on NFC module");
                     connection.end();
                 } else {
 

@@ -28,55 +28,60 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ]}`;
-              
-          var jsonObj = JSON.parse(jsonString);
+          var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
 
-          // console.log("querystring:" + querystring.stringify(jsonObj));
-          // console.log("stringify:" + JSON.stringify(jsonObj));
-
-          // var logObj = querystring.stringify(jsonObj);
-          var logObj = JSON.stringify(jsonObj);
+          var postData = {
+            "log_set": JSON.parse(jsonString)
+          }
 
           var options = { 
                 method: 'POST',
-                // url: 'https://safe-journey-59939.herokuapp.com/logData',
-                url: 'still-oasis-34724.herokuapp.com/uploadLog',
-                // port: '80',
-                port: '3000',
-                // path: 'uploadLog',
+                url: 'https://still-oasis-34724.herokuapp.com/uploadLog',
                 headers: 
                 { 
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(logObj)
+                  'Postman-Token': '5d1436e7-228e-421b-bb71-5083dabb6b22',
+                  'cache-control': 'no-cache',
+                  'Content-Type': 'application/json'
                 },
-                qs: {"logFile": logObj} 
+                body: postData,
+                json: true
             };
 
           //send log to reporting  
           request(options, (err, response, body) => {
             if(err) {
+              res.status(200).json({
+                status: "fail",
+                message: "could not send logs",
+                error: err.message
+              });
               console.log(err.message);
             }
             else {
-              console.log(response.statusCode);
-              fs.unlink("logs.txt", (err) => {
-                if(err){
-                  console.log(err.message);
-                  res.status(200).json({
-                    status: "fail",
-                    message: "did not send Logs"
-                  });
-                } else {
-                  console.log("Log File Deleted");
-                  res.status(200).json({
-                    status: "success",
-                    message: "sent Logs"
-                  });
-                }
-              });
+              if(response.statusCode == 200) {
 
-              // send response back to /sendLogs request to notify them that logs were successfully sent
+                res.status(200).json({
+                  status: "success",
+                  message: "logs sent",
+                  response: body,
+                  data: postData
+                });
+
+                fs.unlink("logs.txt", (err) => {
+                  if(err){
+                    console.log("Log file could not be reset");  
+                  } else {
+                    console.log("Log file reset");
+                  }
+                });
+              } else {
+                res.status(200).json({
+                  status: "fail",
+                  message: "could not send logs",
+                  response: body,
+                  data: postData
+                });
+              }
             }
           });
       }
@@ -89,12 +94,12 @@ var querystring = require('querystring')
 
     router.post('/', (req, res) => {
 
-       // read log objects from file
+      // read log objects from file
       fs.readFile('logs.txt', (err, contents) => {
        
         if(err) {
           console.log(err.message);
-          res.status(404).json({
+          res.status(200).json({
             status: "fail",
             message: "no logs to send"
           });
@@ -102,55 +107,60 @@ var querystring = require('querystring')
         else{
 
           // create json array
-          var jsonString = `{"logs":[ ${contents} ]}`;
-              
-          var jsonObj = JSON.parse(jsonString);
+          var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
 
-          // console.log("querystring:" + querystring.stringify(jsonObj));
-          // console.log("stringify:" + JSON.stringify(jsonObj));
-
-          // var logObj = querystring.stringify(jsonObj);
-          var logObj = JSON.stringify(jsonObj);
+          var postData = {
+            "log_set": JSON.parse(jsonString)
+          }
 
           var options = { 
                 method: 'POST',
-                // url: 'https://safe-journey-59939.herokuapp.com/logData',
-                url: 'still-oasis-34724.herokuapp.com/uploadLog',
-                // port: '80',
-                port: '3000',
-                // path: 'uploadLog',
+                url: 'https://still-oasis-34724.herokuapp.com/uploadLog',
                 headers: 
                 { 
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(logObj)
+                  'Postman-Token': '5d1436e7-228e-421b-bb71-5083dabb6b22',
+                  'cache-control': 'no-cache',
+                  'Content-Type': 'application/json'
                 },
-                qs: {"logFile": logObj} 
+                body: postData,
+                json: true
             };
 
           //send log to reporting  
           request(options, (err, response, body) => {
             if(err) {
+              res.status(200).json({
+                status: "fail",
+                message: "could not send logs",
+                error: err.message
+              });
               console.log(err.message);
             }
             else {
-              console.log(response.statusCode);
-              fs.unlink("logs.txt", (err) => {
-                if(err){
-                  console.log(err.message);
-                  res.status(200).json({
-                    status: "fail",
-                    message: "did not send Logs"
-                  });
-                } else {
-                  console.log("Log File Deleted");
-                  res.status(200).json({
-                    status: "success",
-                    message: "sent Logs"
-                  });
-                }
-              });
+              if(response.statusCode == 200) {
 
-              // send response back to /sendLogs request to notify them that logs were successfully sent
+                res.status(200).json({
+                  status: "success",
+                  message: "logs sent",
+                  response: body,
+                  data: postData
+                });
+
+                fs.unlink("logs.txt", (err) => {
+                  if(err){
+                    console.log("Log file could not be reset");  
+                  } else {
+                    console.log("Log file reset");
+                  }
+                });
+              } else {
+                res.status(200).json({
+                  status: "fail",
+                  message: "could not send logs",
+                  response: body,
+                  data: postData
+                });
+              }
             }
           });
       }
