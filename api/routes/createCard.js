@@ -127,17 +127,18 @@ function createCard(req, res, next)
                         }
                     };
                     
-                    var stringified = JSON.stringify(jsonObject); //Stringify JSON object before using it in body
+                    // var stringified = JSON.stringify(jsonObject); //Stringify JSON object before using it in body
 
                     var options = { //Double check port once their API is up and running, ****NB****
                         method: 'POST',
-                        url: 'http://merlotnotification.herokuapp.com/',
+                        url: 'ec2-35-174-115-93.compute-1.amazonaws.com:5000',
                         headers: { 
                             'Postman-Token': 'fe00621e-2cbe-4120-83c5-1b340d0b541e',
                             'cache-control': 'no-cache',
                             'Content-Type': 'application/json' 
                         },
-                        body: stringified
+                        body: jsonObject,
+                        json: true
                     };
 
                     request(options, (err, response, body) => { //Logging on our side whether we successfully sent it to them or not
