@@ -112,7 +112,6 @@ function createCard(req, res, next)
                     cardID = results.insertId;
                     console.log("inserted card: " + cardID);
                     res.locals.description = "activated";
-                    res.status(200);
                     res.locals.success = "1";
                     res.locals.cardID = cardID;
             
