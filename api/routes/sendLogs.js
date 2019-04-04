@@ -30,7 +30,9 @@ var querystring = require('querystring')
           // create json array
           var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
 
-          var postData = JSON.parse(jsonString);
+          var postData = {
+            "log_set": JSON.parse(jsonString)
+          }
 
           var options = { 
                 method: 'POST',
@@ -62,7 +64,7 @@ var querystring = require('querystring')
                   status: "success",
                   message: "logs sent",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
 
                 fs.unlink("logs.txt", (err) => {
@@ -77,7 +79,7 @@ var querystring = require('querystring')
                   status: "fail",
                   message: "could not send logs",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
               }
             }
@@ -107,7 +109,9 @@ var querystring = require('querystring')
           // create json array
           var jsonString = `{"logs":[ ${contents} ],"system":"nfc"}`;
 
-          var postData = JSON.parse(jsonString);
+          var postData = {
+            "log_set": JSON.parse(jsonString)
+          }
 
           var options = { 
                 method: 'POST',
@@ -139,7 +143,7 @@ var querystring = require('querystring')
                   status: "success",
                   message: "logs sent",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
 
                 fs.unlink("logs.txt", (err) => {
@@ -154,7 +158,7 @@ var querystring = require('querystring')
                   status: "fail",
                   message: "could not send logs",
                   response: body,
-                  data: JSON.parse(jsonString)
+                  data: postData
                 });
               }
             }
