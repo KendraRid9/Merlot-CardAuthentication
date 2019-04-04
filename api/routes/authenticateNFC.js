@@ -213,7 +213,7 @@ function authenticateGetNFC(req, res, next) {
             ClientID: "",
             Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
-        connection.end();
+        //connection.end();
     } 
 }
 
@@ -400,7 +400,7 @@ function authenticatePostNFC(req, res, next) {
             ClientID: "",
             Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
-        connection.end();
+        //connection.end();
     }
 }
 
