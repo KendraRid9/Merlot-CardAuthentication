@@ -83,27 +83,28 @@ describe('/authenticateNFC', () => {
             });
             
         });
-    });
-        
-    describe('Only PIN', () => {
-        it('Invalid scenario', () => {
-            let body = {
-                "pin": 123
-            };
 
-            chai
-                .request(host)
-                .post(path)
-                .send(body)
-                .end((err, res) => {
-                    res.body.should.be.eql({
-                        Success: false,
-                        ClientID: "",
-                        Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry."
+        describe('Only PIN', () => {
+            it('Invalid scenario', () => {
+                let body = {
+                    "pin": 123
+                };
+    
+                chai
+                    .request(host)
+                    .post(path)
+                    .send(body)
+                    .end((err, res) => {
+                        res.body.should.be.eql({
+                            Success: false,
+                            ClientID: "",
+                            Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry."
+                        });
                     });
-                });
+            });
         });
     });
+        
 
     describe('Request with both parameters', () => {
         it('Both valid', () => {
@@ -180,88 +181,98 @@ describe('/authenticateNFC', () => {
     });
 });
 
-// describe('/createCard', () => {
-//     const path = '/createCard';
+describe('/createCard', () => {
+    const path = '/createCard';
 
-//     describe('Database connection error', () => {
-//         it('Failed connection', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("7: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //sent by DBMS, not sure
-//                 });
-//         });
-//     });
+    describe('Database connection error', () => {
+        it('Failed connection', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.body.should.be.deep.eql({
+                        status: "fail",
+                        message: "no clientID received"
+                    }); //sent by DBMS, not sure
+                });
+        });
+    });
 
-//     describe('Request with no parameter', () => {
-//         it('Empty request', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("8: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //no clientID received
-//                 });
-//         });
-//     });
-//     describe('Request with parameter', () => {
-//         it('Successful card creation', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("9: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //activated
-//                 });
-//         });
+    describe('Request with no parameter', () => {
+        it('Empty request', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        status: "fail",
+                        message: "no clientID received"
+                    });
+                });
+        });
+    });
 
-//         it('Unsuccessful card creation', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("10: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //sent by DBMS, not sure
-//                 });
-//         });
+    describe('Request with parameter', () => {
+        // it('Successful card creation', () => {
+        //     let body = {
+        //         "clientID": "6" //I'm gonna regret putting my own clientID here, my emails are getting spammed
+        //     };
 
-//         describe('Notified Client Notification Subsystem', () => {
-//             it('Successful notification', () => {
-//                 chai
-//                     .request(host)
-//                     .post(path)
-//                     .send()
-//                     .end((err, res) => {
-//                         console.log("11: " + res.body);
-//                         res.body.should.be.eql("");
-//                         // res.should.have.status(200);
-//                     });
-//             });
+        //     chai
+        //         .request(host)
+        //         .post(path)
+        //         .send(body)
+        //         .end((err, res) => {
+        //             res.body.should.be.eql({
+        //                 status: "success",
+        //                 message: "card created",
+        //                 notifyClient: "success"
+        //             });
+        //         });
+        // });
 
-//             it('Unsuccessful notification', () => {
-//                 chai
-//                     .request(host)
-//                     .post(path)
-//                     .send()
-//                     .end((err, res) => {
-//                         console.log("12: " + res.body);
-//                         res.body.should.be.eql("");
-//                         // res.should.have.status(200); //invalid syntax
-//                     });
-//             });
-//         });
-//     });
-// });
+        it('Unsuccessful card creation', () => {
+            let body = {
+                "clientID": ""
+            };
+
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        status: "fail",
+                        message: "no clientID received"
+                    });
+                });
+        });
+    });
+
+    describe('Notified Client Notification Subsystem', () => {
+        it('Successful notification', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(200); //If we've gotten a 200 response from them, they received it
+                });
+        });
+
+        it('Unsuccessful notification', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(200); //If we've gotten a 404 response from them, they didn't receive it
+                });
+        });
+    });
+});
 
 // describe('/cancelCard', () => {
 //     const path ='/cancelCard';
