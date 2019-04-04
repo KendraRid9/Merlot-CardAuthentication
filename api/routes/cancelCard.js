@@ -31,7 +31,7 @@ function createConnection(){
 
     function cancelCard(req, res, next) {
         if(req.body.clientID === undefined || req.body.clientID == ''){
-            res.status(404).json({
+            res.status(200).json({
                 message: "No clientID was found"
             });
         } else {
@@ -40,7 +40,7 @@ function createConnection(){
             let connection = createConnection();
             connection.connect(function(err) {
                 if(err) {
-                    res.status(500).json({
+                    res.status(200).json({
                         status: "fail", 
                         message: "database connection issue on NFC module",
                     });
@@ -50,7 +50,7 @@ function createConnection(){
                     let query = 'Select * from CardAuthentication where clientID =' + clientID;
                     connection.query(query, function(err, rows){
                         if(rows.length == 0){
-                            res.status(404).json({
+                            res.status(200).json({
                                 status: "fail", 
                                 message: "client not found in database",
                             });
@@ -60,7 +60,7 @@ function createConnection(){
                             {
                                 if (err) {
                                     console.log(err.message);
-                                    res.status(500).json({
+                                    res.status(200).json({
                                         status: "fail", 
                                         message: "database connection issue on NFC module",
                                     });
@@ -97,7 +97,7 @@ function createConnection(){
         }else {
             connection.connect(function(err) {
                 if(err){
-                    res.status(404).json({
+                    res.status(200).json({
                         message: "could not log card cancellation. Database connection issue on NFC module",
                         error: err.message
                     });
@@ -106,7 +106,7 @@ function createConnection(){
 
                     connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${res.locals.clientID}`, (err, rows) => {
                         if(err){
-                            res.status(404).json({
+                            res.status(200).json({
                                 message: "client not found"
                             });
 
@@ -183,7 +183,7 @@ function createConnection(){
                                 }  
         
                             } else {
-                                res.status(404).json({
+                                res.status(200).json({
                                     message: "client not found"
                                 });
 
