@@ -202,7 +202,7 @@ function authenticateGetNFC(req, res, next) {
     //Any other error that may occur
     else {
         res.status(500).json({
-            Success: false,
+            Success: "false",
             ClientID: "",
             Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry.",
         });
