@@ -90,6 +90,7 @@ function createCard(req, res, next)
             cardID = -1;
             connection.query(sql,values,(err,results,fields) =>
             {
+                connection.end();
                 if(err)
                 {
                     resStatus = "fail";
@@ -101,7 +102,6 @@ function createCard(req, res, next)
                         message: resMessage
                     });
 
-                    connection.end();
                     res.locals.description = err.message;
                     res.locals.success = "0";
                     res.locals.cardID = "-1";
@@ -169,13 +169,15 @@ function createCard(req, res, next)
                         }
                     })
                     // **************************************************************************************
-
-                    connection.end();
                     next();  
                 }
             });   
         }
     });
+
+    // if(connection.state === 'disconnected'){
+    //     connection.end();
+    // }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -224,6 +226,8 @@ function logCreate(req, res)
                  console.log("Successfully Logged Card Creation to Log File.");
             }
         });
+
+        console.log(res.locals.cardID);
         // **************************************************
     }
 }

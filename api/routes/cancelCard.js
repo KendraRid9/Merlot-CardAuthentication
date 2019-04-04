@@ -45,7 +45,7 @@ function createConnection(){
                         message: "database connection issue on NFC module",
                     });
                     console.log(err.message);
-                    connection.end(); 
+                    connection.end();
                 } else {
                     let query = 'Select * from CardAuthentication where clientID =' + clientID;
                     connection.query(query, function(err, rows){
@@ -58,20 +58,20 @@ function createConnection(){
                         } else {
                             connection.query(`UPDATE CardAuthentication SET active = 0 WHERE clientID = ${clientID}`, function (err, result) 
                             {
+                                connection.end(); 
                                 if (err) {
                                     console.log(err.message);
                                     res.status(200).json({
                                         status: "fail", 
                                         message: "database connection issue on NFC module",
                                     });
-                                    connection.end();
                                 } else {
                                     console.log(result.affectedRows + " record(s) updated");
                                     res.status(200).json({
                                         status: "success", 
                                         message: "cards cancelled"
                                     });
-                                    connection.end();
+
                                 }   
                             });
                         }
@@ -102,9 +102,9 @@ function createConnection(){
                 } else {
 
                     connection.query(`SELECT * FROM CardAuthentication WHERE clientID = ${res.locals.clientID}`, (err, rows) => {
+                        connection.end();
                         if(err){
                            console.log("client not found");
-                           connection.end();
                         }
                         else {
 
