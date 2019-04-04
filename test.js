@@ -6,11 +6,23 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 chai.should();
 
-const host = 'https://merlot-card-authentication.herokuapp.com/'
+const host = 'https://merlot-card-authentication.herokuapp.com'
 
 //Testing for endpoint => authenticateNFC
 describe('/authenticateNFC', () => {
     const path = '/authenticateNFC';
+
+    describe('Database connection error', () => {
+        it('Failed connection', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(500); //sent by DBMS, not sure
+                });
+        });
+    });
 
     describe('Request with no parameters', () => {
         it('Empty request', () => {
@@ -121,12 +133,79 @@ describe('/authenticateNFC', () => {
     });
 });
 
-describe('createCard', () => {
+describe('/createCard', () => {
+    const path = '/createCard';
 
+    describe('Database connection error', () => {
+        it('Failed connection', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(500); //sent by DBMS, not sure
+                });
+        });
+    });
+
+    describe('Request with no parameter', () => {
+        it('Empty request', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(400); //no clientID received
+                });
+        });
+    });
+    describe('Request with parameter', () => {
+        it('Successful card creation', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(200); //activated
+                });
+        });
+
+        it('Unsuccessful card creation', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.should.have.status(404); //sent by DBMS, not sure
+                });
+        });
+
+        describe('Notified Client Notification Subsystem', () => {
+            it('Successful notification', () => {
+                chai
+                    .request(host)
+                    .post(path)
+                    .send()
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                    });
+            });
+
+            it('Unsuccessful notification', () => {
+                chai
+                    .request(host)
+                    .post(path)
+                    .send()
+                    .end((err, res) => {
+                        res.should.have.status(400); //invalid syntax
+                    });
+            });
+        });
+    });
 });
 
-describe('authenticateNFC', () => {
-
+describe('/cancelCard', () => {
+    
 });
 
 describe('sendLogs', () => {
