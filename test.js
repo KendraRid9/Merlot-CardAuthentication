@@ -19,7 +19,11 @@ describe('/authenticateNFC', () => {
                 .post(path)
                 .send()
                 .end((err, res) => {
-                    res.body.should.be.deep.eql({ Success: 'false', ClientID: '', Message: 'Expected cardID' }); //sent by DBMS, not sure
+                    res.body.should.be.deep.eql({
+                        Success: 'false',
+                        ClientID: '',
+                        Message: 'Expected cardID'
+                    }); //sent by DBMS, not sure
                 });
         });
     });
@@ -31,7 +35,11 @@ describe('/authenticateNFC', () => {
                 .post(path)
                 .send()
                 .end((err, res) => {
-                    res.body.should.be.eql({ Success: 'false', ClientID: '', Message: 'Expected cardID' });
+                    res.body.should.be.eql({
+                        Success: 'false',
+                        ClientID: '',
+                        Message: 'Expected cardID'
+                    });
                 });
         });
     });
@@ -48,7 +56,11 @@ describe('/authenticateNFC', () => {
                 .post(path)
                     .send(body)
                     .end((err, res) => {
-                        res.body.should.be.eql({"Success":"false","ClientID":"","Message":"card deactivated"});
+                        res.body.should.be.eql({
+                            Success:"false",
+                            ClientID:"",
+                            Message:"card deactivated"
+                        });
                     });
             });
             
@@ -62,7 +74,11 @@ describe('/authenticateNFC', () => {
                 .post(path)
                 .send(body)
                 .end((err, res) => {
-                    res.body.should.be.eql({"Success":"false","ClientID":"","Message":"cardID not found"});
+                    res.body.should.be.eql({
+                        Success:"false",
+                        ClientID:"",
+                        Message:"cardID not found"
+                    });
                 });
             });
             
@@ -80,7 +96,11 @@ describe('/authenticateNFC', () => {
                 .post(path)
                 .send(body)
                 .end((err, res) => {
-                    res.body.should.be.eql({"Success":false,"ClientID":"","Message":"We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry."});
+                    res.body.should.be.eql({
+                        Success: false,
+                        ClientID: "",
+                        Message: "We messed up somewhere, and we don't know why. You should honestly not be getting this error. Sorry."
+                    });
                 });
         });
     });
@@ -88,7 +108,8 @@ describe('/authenticateNFC', () => {
     describe('Request with both parameters', () => {
         it('Both valid', () => {
             let body = {
-                "cardID": 200,
+                "cardID": "418",
+                "pin": "9030"
             };
             
             chai
@@ -96,14 +117,18 @@ describe('/authenticateNFC', () => {
             .post(path)
             .send(body)
             .end((err, res) => {
-                res.body.should.be.eql({"Success":"true","ClientID":5,"Message":"authenticated"});
+                res.body.should.be.eql({
+                    Success: "true",
+                    ClientID: 8,
+                    Message: "authenticated"
+                });
             });
         });
 
         it('Invalid PIN', () => {
             let body = {
-                "cardID": 200,
-                "pin": 999
+                "cardID": "418",
+                "pin": "1234"
             };
 
             chai
@@ -111,25 +136,47 @@ describe('/authenticateNFC', () => {
                 .post(path)
                 .send(body)
                 .end((err, res) => {
-                    res.body.should.be.eql({"Success":"false","ClientID":"","Message":"card deactivated"});
+                    res.body.should.be.eql({
+                        Success: "false",
+                        ClientID: 8,
+                        Message: "pin invalid"
+                    });
                 });
         });
 
-        // it('Invalid cardID', () => {
-        //     let body = {
-        //         "cardID": 2,
-        //         // "pin": 999
-        //     };
+        it('Invalid cardID', () => {
+            let body = {
+                "cardID": "9999",
+                "pin": "1234"
+            };
 
-        //     chai
-        //         .request(host)
-        //         .post(path)
-        //         .send(body)
-        //         .end((err, res) => {
-        //             console.log("6: " + res.body);
-        //             res.body.should.be.eql({"Success":"false","ClientID":"","Message":"cardID not found"});
-        //         });
-        // });
+            chai
+                .request(host)
+                .post(path)
+                .send(body)
+                .end((err, res) => {
+                    res.body.should.be.eql({"Success":"false","ClientID":"","Message":"cardID not found"});
+                });
+        });
+
+        it('Deactivated card', () => {
+            let body = {
+                "cardID": "200",
+                "pin": "1234"
+            };
+
+            chai
+                .request(host)
+                .post(path)
+                .send(body)
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        Success: "false",
+                        ClientID: "",
+                        Message: "card deactivated"
+                    });
+                });
+        });
     });
 });
 
