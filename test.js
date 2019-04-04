@@ -181,7 +181,7 @@ describe('/authenticateNFC', () => {
     });
 });
 
-describe('/createCard', () => {
+describe('/createCard', () => { //TODO uncomment successful card creation
     const path = '/createCard';
 
     describe('Database connection error', () => {
@@ -274,64 +274,74 @@ describe('/createCard', () => {
     });
 });
 
-// describe('/cancelCard', () => {
-//     const path ='/cancelCard';
+describe('/cancelCard', () => {
+    const path ='/cancelCard';
 
-//     describe('Database connection error', () => {
-//         it('Failed connection', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("13: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //sent by DBMS, not sure
-//                 });
-//         });
-//     });
+    describe('Database connection error', () => {
+        it('Failed connection', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        message: "No clientID was found"
+                    });
+                });
+        });
+    });
 
-//     describe('Request with no parameter', () => {
-//         it('Empty request', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("14: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200);
-//                 });
-//         });
+    describe('Request with no parameter', () => {
+        it('Empty request', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        message: "No clientID was found"
+                    });
+                });
+        });
 
-//     });
+    });
 
-//     describe('Request with parameter', () => {
-//         it('Valid clientID', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("15: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //card cancelled
-//                 });
-//         });
+    describe('Request with parameter', () => {
+        it('Valid clientID', () => {
+            let body = {
+                "clientID": "13"
+            };
 
-//         it('Invalid clientID', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("16: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //no clientID was found
-//                 });
-//         });
-//     });
-// });
+            chai
+                .request(host)
+                .post(path)
+                .send(body)
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        status: "success",
+                        message: "cards cancelled"
+                    });
+                });
+        });
+
+        it('Invalid clientID', () => {
+            let body = {
+                "clientID": "999999"
+            };
+            
+            chai
+                .request(host)
+                .post(path)
+                .send(body)
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        status: "fail",
+                        message: "client not found in database"
+                    });
+                });
+        });
+    });
+});
 
 // describe('/sendLogs', () => {
 //     const path = '/sendLogs';
