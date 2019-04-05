@@ -103,7 +103,7 @@ function createCard(req, res, next)
                     });
 
                     res.locals.description = err.message;
-                    res.locals.success = "0";
+                    res.locals.success = false;
                     res.locals.cardID = "-1";
                     next();
                 }
@@ -112,7 +112,7 @@ function createCard(req, res, next)
                     cardID = results.insertId;
                     console.log("inserted card: " + cardID);
                     res.locals.description = "activated";
-                    res.locals.success = "1";
+                    res.locals.success = true;
                     res.locals.cardID = cardID;
             
                     // **************************************************************************************
@@ -189,8 +189,8 @@ function logCreate(req, res)
 
         //get timestamp
         var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var date = today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+        var time = ("0" + today.getHours()).slice(-2) + ":" + ("0" + today.getMinutes()).slice(-2) + ":" + ("0" + today.getSeconds()).slice(-2);
         var dateTime = date + ' ' + time;
         
         var log = {
