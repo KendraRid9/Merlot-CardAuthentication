@@ -181,7 +181,7 @@ describe('/authenticateNFC', () => {
     });
 });
 
-describe('/createCard', () => { //TODO uncomment successful card creation
+describe('/createCard', () => {
     const path = '/createCard';
 
     describe('Database connection error', () => {
@@ -214,24 +214,37 @@ describe('/createCard', () => { //TODO uncomment successful card creation
         });
     });
 
-    describe('Request with parameter', () => {
-        // it('Successful card creation', () => {
-        //     let body = {
-        //         "clientID": "6" //I'm gonna regret putting my own clientID here, my emails are getting spammed
-        //     };
+    describe('Request with parameter', () => { //TODO
+        it('Successful card creation', () => {
+            let body = {
+                "clientID": "6" //I'm gonna regret putting my own clientID here, my emails are getting spammed
+            };
 
-        //     chai
-        //         .request(host)
-        //         .post(path)
-        //         .send(body)
-        //         .end((err, res) => {
-        //             res.body.should.be.eql({
-        //                 status: "success",
-        //                 message: "card created",
-        //                 notifyClient: "success"
-        //             });
-        //         });
-        // });
+            chai
+                .request(host)
+                .post(path)
+                .send(body)
+                .end((err, res) => {
+                    res.body.should.be.eql({
+                        status: "success",
+                        message: "card created",
+                        notifyClient: "success"
+                    });
+                    //IF NOTIFICATION SUBSYS GOES DOWN:
+                    //{
+                    //     status: "success",
+                    //     message: "card created",
+                    //     notifyClient: false
+                    // }
+
+                    //IF THEY STAY UP:
+                    //{
+                    //     status: "success",
+                    //     message: "card created",
+                    //     notifyClient: "success"
+                    // }
+                });
+        });
 
         it('Unsuccessful card creation', () => {
             let body = {
@@ -343,32 +356,28 @@ describe('/cancelCard', () => {
     });
 });
 
-// describe('/sendLogs', () => {
-//     const path = '/sendLogs';
+describe('/sendLogs', () => {
+    const path = '/sendLogs';
 
-//     describe('Send logs to Reporting Subsystem', () => {
-//         it('Successfully sent', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("17: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //successfully sent
-//                 });
-//         });
+    describe('Send logs to Reporting Subsystem', () => {
+        it('Successfully sent', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.status.should.be.eql(200);
+                });
+        });
 
-//         it('Not successfully sent', () => {
-//             chai
-//                 .request(host)
-//                 .post(path)
-//                 .send()
-//                 .end((err, res) => {
-//                     console.log("18: " + res.body);
-//                     res.body.should.be.eql("");
-//                     // res.should.have.status(200); //not successfully sent
-//                 });
-//         });
-//     });
-// });
+        it('Not successfully sent', () => {
+            chai
+                .request(host)
+                .post(path)
+                .send()
+                .end((err, res) => {
+                    res.status.should.be.eql(200);
+                });
+        });
+    });
+});
