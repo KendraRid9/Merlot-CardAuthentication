@@ -77,7 +77,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -89,7 +89,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "card deactivated"    
                         });
                         res.locals.description = "card de-activated";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = rows[0].cardType;
                         res.locals.clientID = "null";
                         next();
@@ -101,7 +101,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "authenticated"
                         });
                         res.locals.description = "authenticated";
-                        res.locals.authenticated = "1";
+                        res.locals.authenticated = true;
                         res.locals.cardType = rows[0].cardType;
                         res.locals.clientID = rows[0].clientID;
                         next();
@@ -112,7 +112,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -143,7 +143,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -155,7 +155,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -168,7 +168,7 @@ function authenticateGetNFC(req, res, next) {
                             Message: "card deactivated"
                         });
                         res.locals.description = "card de-activated";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = rows[0].cardType;
                         res.locals.clientID = "null";
                         next();
@@ -185,7 +185,7 @@ function authenticateGetNFC(req, res, next) {
                                 Message: "pin invalid"
                             });
                             res.locals.description = "PIN invalid";
-                            res.locals.authenticated = "0";
+                            res.locals.authenticated = false;
                             res.locals.cardType = rows[0].cardType;
                             res.locals.clientID = rows[0].clientID;
                             next();
@@ -196,7 +196,7 @@ function authenticateGetNFC(req, res, next) {
                                 Message: "authenticated"
                             });
                             res.locals.description = "authenticated";
-                            res.locals.authenticated = "1";
+                            res.locals.authenticated = true;
                             res.locals.cardType = rows[0].cardType;
                             res.locals.clientID = rows[0].clientID;
                             next();
@@ -267,7 +267,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -279,7 +279,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "card deactivated"    
                         });
                         res.locals.description = "card de-activated";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = rows[0].cardType;
                         res.locals.clientID = "null";
                         next();
@@ -291,7 +291,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "authenticated"
                         });
                         res.locals.description = "authenticated";
-                        res.locals.authenticated = "1";
+                        res.locals.authenticated = true;
                         res.locals.cardType = rows[0].cardType;
                         res.locals.clientID = rows[0].clientID;
                         next();
@@ -302,7 +302,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -332,7 +332,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -344,7 +344,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "cardID not found"
                         });
                         res.locals.description = "cardID not found";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = "null";
                         res.locals.clientID = "null";
                         next();
@@ -356,7 +356,7 @@ function authenticatePostNFC(req, res, next) {
                             Message: "card deactivated"
                         });
                         res.locals.description = "card de-activated";
-                        res.locals.authenticated = "0";
+                        res.locals.authenticated = false;
                         res.locals.cardType = rows[0].cardType;
                         res.locals.clientID = "null";
                         next();
@@ -372,7 +372,7 @@ function authenticatePostNFC(req, res, next) {
                                 Message: "pin invalid"
                             });
                             res.locals.description = "PIN invalid";
-                            res.locals.authenticated = "0";
+                            res.locals.authenticated = false;
                             res.locals.cardType = rows[0].cardType;
                             res.locals.clientID = rows[0].clientID;
                             next();
@@ -383,7 +383,7 @@ function authenticatePostNFC(req, res, next) {
                                 Message: "authenticated"
                             });
                             res.locals.description = "authenticated";
-                            res.locals.authenticated = "1";
+                            res.locals.authenticated = true;
                             res.locals.cardType = rows[0].cardType;
                             res.locals.clientID = rows[0].clientID;
                             next();
@@ -414,9 +414,9 @@ function logAuthentication(req, res) {
 
         //get timestamp
         var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date+' '+time;
+        var date = today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+        var time = ("0" + today.getHours()).slice(-2) + ":" + ("0" + today.getMinutes()).slice(-2) + ":" + ("0" + today.getSeconds()).slice(-2);
+        var dateTime = date + ' ' + time;
         
         var log = {
             "logType" : "cardAuthentication",

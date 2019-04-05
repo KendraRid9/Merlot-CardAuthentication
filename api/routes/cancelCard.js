@@ -112,8 +112,8 @@ function createConnection(){
                                 
                                 //get timestamp
                                 var today = new Date();
-                                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                                var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                                var date = today.getFullYear()+'-0'+(today.getMonth()+1)+'-0'+today.getDate();
+                                var time = ("0" + today.getHours()).slice(-2) + ":" + ("0" + today.getMinutes()).slice(-2) + ":" + ("0" + today.getSeconds()).slice(-2);
                                 var dateTime = date + ' ' + time;
 
                                 // iterate for all the rows in result
@@ -124,9 +124,9 @@ function createConnection(){
                                             "logType" : "cardCancelled",
                                             "cardID" : rows[i].cardID,
                                             "cardType" : rows[i].cardType,
-                                            "clientID" : res.locals.clientID,
+                                            "clientID" : rows[i].clientID,
                                             "description" : "de-activated",
-                                            "success" : "1",
+                                            "success" : true,
                                             "timestamp" : dateTime
                                         }
                                         if (fs.existsSync("logs.txt")) {
@@ -146,9 +146,9 @@ function createConnection(){
                                             "logType" : "cardCancelled",
                                             "cardID" : rows[i].cardID,
                                             "cardType" : rows[i].cardType,
-                                            "clientID" : res.locals.clientID,
+                                            "clientID" : rows[i].clientID,
                                             "description" : "error",
-                                            "success" : "0",
+                                            "success" : false,
                                             "timestamp" : dateTime
                                         }
 
